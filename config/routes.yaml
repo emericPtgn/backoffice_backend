@@ -3,3 +3,31 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+
+api_login_check:
+    path: /api/login_check
+
+
+app_artiste:
+    path: /artiste
+    controller: App\Controller\ArtisteController::index
+    #[Route('/artiste', name: 'app_artiste')]
+
+
+# config/routes.yaml
+
+app_registration:
+    path: /account
+    controller: App\Controller\AccountController::registerAction
+
+
+api_user_new_user:
+    path: /api/user/addnew
+    controller: App\Controller\UserController::addUser
+    methods: ['POST']
+
+
+api_user_remove_user:
+    path: /api/user/remove
+    controller: App\Controller\UserController::removeUser
+    methods: ['DELETE']
