@@ -42,6 +42,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[MongoDB\Field(type: 'date')]
     private ?DateTime $dateModification = null;
 
+    #[MongoDB\Field(type: 'boolean')]
+    private bool $isVerified = false;
+
+    #[MongoDB\Field(type: 'string')]
+    private ?string $verificationToken = null;
+
+    #[MongoDB\Field(type: 'date')]
+    private ?DateTime $verificationTokenExpiresAt = null;
+
     public function __construct()
     {
         $this->dateCreation = new DateTime();
@@ -148,6 +157,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDateModification(DateTime $dateModification): self
     {
         $this->dateModification = $dateModification;
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function getVerificationToken(): ?string
+    {
+        return $this->verificationToken;
+    }
+
+    public function getVerificationTokenExpiresAt(): ?DateTime
+    {
+        return $this->verificationTokenExpiresAt;
+    }
+
+    public function setIsVerified(bool $isVerified): self
+    {
+        $this->isVerified = $isVerified;
+        return $this;
+    }
+
+    public function setVerificationToken(?string $verificationToken): self
+    {
+        $this->verificationToken = $verificationToken;
+        return $this;
+    }
+
+    public function setVerificationTokenExpiresAt(?DateTime $verificationTokenExpiresAt): self
+    {
+        $this->verificationTokenExpiresAt = $verificationTokenExpiresAt;
         return $this;
     }
 }

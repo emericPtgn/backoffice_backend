@@ -8,10 +8,9 @@ api_login_check:
     path: /api/login_check
 
 
-app_artiste:
-    path: /artiste
-    controller: App\Controller\ArtisteController::index
-    #[Route('/artiste', name: 'app_artiste')]
+app_homepage:
+    path: /
+    controller: App\Controller\HomePageController::index
 
 
 # config/routes.yaml

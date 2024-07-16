@@ -17,7 +17,10 @@ class Activite
     private string $nom;
 
     #[MongoDB\Field(type: "date")]
-    private \DateTime $date;
+    private ?\DateTime $date;
+
+    #[MongoDB\Field(type: "int", name:'duree_minutes')]
+    private ?int $duree_min = null;
 
     #[MongoDB\Field(type: "string")]
     private string $type; // Peut être 'concert', 'dedicace', 'jeu divers'
@@ -63,6 +66,16 @@ class Activite
     public function setDate(\DateTime $date): self
     {
         $this->date = $date;
+        return $this;
+    }
+    public function getDuree(): int
+    {
+        return $this->duree_min;
+    }
+
+    public function setDuree(int $duree_min): self
+    {
+        $this->duree_min = $duree_min;
         return $this;
     }
 
