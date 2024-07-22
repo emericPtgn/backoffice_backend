@@ -2,25 +2,38 @@
 
 namespace App\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use App\Repository\EmplacementRepository;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 #[MongoDB\Document(collection: 'emplacement', repositoryClass: EmplacementRepository::class)]
 class Emplacement
 {
     #[MongoDB\Id]
+    #[Groups(["activite", "commerce", "emplacement"])]
     private string $id;
 
     #[MongoDB\Field(type: "string")]
+    #[Groups(["activite", "commerce", "emplacement"])]
     private string $nom;
 
     #[MongoDB\Field(type: "float")]
+    #[Groups(["activite", "commerce", "emplacement"])]
     private float $latitude;
 
     #[MongoDB\Field(type: "float")]
+    #[Groups(["activite", "commerce", "emplacement"])]
     private float $longitude;
 
     // Getter and Setter methods
+
+    public function __construct(string $nom = '', float $lat = 0.0, float $long = 0.0)
+    {
+        $this->nom = $nom;
+        $this->latitude = $lat;
+        $this->longitude = $long;
+    }
+
 
     public function getId(): string
     {
@@ -59,4 +72,13 @@ class Emplacement
         $this->longitude = $longitude;
         return $this;
     }
+
+    public function initialize(string $nom, float $lat, float $long): self
+    {
+        $this->nom = $nom;
+        $this->latitude = $lat;
+        $this->longitude = $long;
+        return $this;
+    }
+
 }

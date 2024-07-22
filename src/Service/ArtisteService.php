@@ -24,8 +24,8 @@ class ArtisteService {
         if(isset($requestDatas['style'])){
             $artiste->setStyle($requestDatas['style']);
         }
-        if(isset($requestDatas['style'])){
-            $artiste->addReseauSocial($requestDatas['style']);
+        if(isset($requestDatas['reseauSocial'])){
+            $artiste->addReseauSocial($requestDatas['reseauSocial']);
         }
         $this->dm->persist($artiste);
         $this->dm->flush();

@@ -3,22 +3,28 @@
 namespace App\Controller\API;
 
 use App\Service\CommerceService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 
-class CommerceAPIController {
+class CommerceAPIController extends AbstractController {
 
     private CommerceService $commerceService;
-    public function __construct(CommerceService $commerceService){
+    private SerializerInterface $serializer;
+
+    public function __construct(CommerceService $commerceService, SerializerInterface $serializer){
         $this->commerceService = $commerceService;
+        $this->serializer = $serializer;
     }
 
     #[Route('/api/commerce', name:'api_commerce_addCommerce', methods: ['POST'])]
     public function addCommerce(Request $request) : JsonResponse {
         $requestDatas = json_decode($request->getContent(), true);
         $newCommerce = $this->commerceService->addNewCommerce($requestDatas);
-        return new JsonResponse($newCommerce, 200, [], false);
+        $serializedNewCommerce = $this->serializer->serialize($newCommerce, 'json');
+        return new JsonResponse($serializedNewCommerce, 200, [], true);
     }
 
     #[Route('/api/commerce/{id}', name:'api_commerce_updateCommerce', methods: ['PUT'])]
@@ -31,13 +37,15 @@ class CommerceAPIController {
     #[Route('/api/commerce/{id}', name:'api_commerce_getCommerce', methods: ['GET'])]
     public function getCommerce($id) : JsonResponse {
         $commerce = $this->commerceService->getCommerce($id);
-        return new JsonResponse($commerce, 200, [], false);
+        $serializedCommerce = $this->serializer->serialize($commerce, 'json', ['groups' => 'commerce']);
+        return new JsonResponse($serializedCommerce, 200, [], true);
     }
 
     #[Route('/api/commerce', name:'api_commerce_getAllConcerts', methods: ['GET'])]
     public function getAllCommerces() : JsonResponse {
         $listCommerces = $this->commerceService->getAllCommerces();
-        return new JsonResponse($listCommerces, 200, [], false);
+        $serializedList = $this->serializer->serialize($listCommerces, 'json', ['groups' => 'commerce']);
+        return new JsonResponse($serializedList, 200, [], true);
     }
 
 }

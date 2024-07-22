@@ -3,6 +3,11 @@ controllers:
         path: ../src/Controller/
         namespace: App\Controller
     type: attribute
+    trailing_slash_on_root: false
+    options:
+        recursive: true
+
+
 
 api_login_check:
     path: /api/login_check
@@ -30,3 +35,14 @@ api_user_remove_user:
     path: /api/user/remove
     controller: App\Controller\UserController::removeUser
     methods: ['DELETE']
+
+
+api_activity_new_activity:
+    path: /api/activity
+    controller: App\Controller\API\ActiviteAPIController::addActivity
+    methods: ['POST']
+
+api_commerce_addCommerce:
+    path: /api/commerce
+    controller: App\Controller\API\CommerceAPIController::addCommerce
+    methods: ['POST']

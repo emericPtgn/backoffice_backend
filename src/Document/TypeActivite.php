@@ -2,18 +2,23 @@
 
 namespace App\Document;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Serializer\Attribute\Groups;
+
 
 #[MongoDB\Document(collection: 'type_activite')]
 class TypeActivite
 {
     #[MongoDB\Id]
+    #[Groups(["activite"])]
     private string $id;
 
     #[MongoDB\Field(type: "string")]
-    private string $nom;
+    #[Groups(["activite"])]
+    private ?string $nom = null;
 
     #[MongoDB\Field(type:'string', name: 'icone_url')]
-    private string $icone;
+    #[Groups(["activite"])]
+    private ?string $icone = null;
 
     public function getId(): string
     {

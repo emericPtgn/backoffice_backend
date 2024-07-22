@@ -2,32 +2,37 @@
 
 namespace App\Document;
 
-use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[MongoDB\Document(repositoryClass: "App\Repository\ArtisteRepository", collection:'artiste')]
 class Artiste
 {
     #[MongoDB\Id(strategy: "AUTO")]
-    #[SerializedName("id")]
+    #[Groups(["artiste", "activite"])]
     protected string $id;
 
     #[MongoDB\Field(type: 'string', name: 'nom')]
-    #[SerializedName("nom")]
+    #[Groups(["artiste", "activite"])]
     protected string $nom;
 
     #[MongoDB\Field(type: 'string', name: 'style')]
-    #[SerializedName("style")]
+    #[Groups(["artiste", "activite"])]
     protected string $style;
 
     #[MongoDB\Field(type: 'string', name: 'description')]
-    #[SerializedName("description")]
+    #[Groups(["artiste", "activite"])]
     protected string $description;
 
     #[MongoDB\EmbedMany(targetDocument: ReseauSocial::class)]
     protected Collection $reseauxSociaux;
+
+    #[MongoDB\EmbedMany(targetDocument: Activite::class)]
+    #[Groups(["artiste"])]
+    protected Collection $activites;
 
     public function __tostring() : string {
         return $this->nom;
@@ -89,4 +94,25 @@ class Artiste
         return $this;
     }
 
+    public function getActivites(): Collection
+    {
+        return $this->activites;
+    }
+
+    public function addActivites(ReseauSocial $activites): self
+    {
+        if (!$this->activites->contains($activites)) {
+            $this->activites->add($activites);
+        }
+
+        return $this;
+    }
+
+    public function removeActivite(Activite $activites): self
+    {
+        $this->activites->removeElement($activites);
+        return $this;
+    }
+
+    
 }

@@ -2,8 +2,13 @@
 
 namespace App\Document;
 
+use App\Document\Artiste;
+use App\Document\Emplacement;
+use App\Document\TypeActivite;
 use App\Repository\ActiviteRepository;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 
 
@@ -11,28 +16,40 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 class Activite
 {
     #[MongoDB\Id]
-    private string $id;
+    #[Groups(["activite"])]
+    private ?string $id;
 
     #[MongoDB\Field(type: "string")]
-    private string $nom;
+    #[Groups(["activite"])]
+    private ?string $nom = null;
 
     #[MongoDB\Field(type: "date")]
-    private ?\DateTime $date;
+    #[Groups(["activite"])]
+    private ?\DateTime $date = null;
 
     #[MongoDB\Field(type: "int", name:'duree_minutes')]
+    #[Groups(["activite"])]
     private ?int $duree_min = null;
 
     #[MongoDB\Field(type: "string")]
-    private string $type; // Peut être 'concert', 'dedicace', 'jeu divers'
+    #[Groups(["activite"])]
+    private ?string $type = null; // Peut être 'concert', 'dedicace', 'jeu divers'
 
     #[MongoDB\EmbedOne(targetDocument: Emplacement::class)]
-    private Emplacement $emplacement;
+    #[Groups(["activite"])]
+    private ?Emplacement $emplacement = null;
 
     #[MongoDB\ReferenceOne(targetDocument: TypeActivite::class)]
-    private TypeActivite $typeActivite;
+    #[Groups(["activite"])]
+    private ?TypeActivite $typeActivite = null;
 
     #[MongoDB\EmbedOne(targetDocument: Artiste::class)]
-    private Artiste $artiste;
+    #[Groups(["activite"])]
+    private ?Artiste $artiste = null;
+
+    #[MongoDB\Field(type: 'string', name: 'description')]
+    #[Groups(["activite"])]
+    protected string $description;
 
     // Autres propriétés et méthodes communes...
 
@@ -63,7 +80,7 @@ class Activite
         return $this->date;
     }
 
-    public function setDate(\DateTime $date): self
+    public function setDate(?\DateTime $date): self
     {
         $this->date = $date;
         return $this;
@@ -120,6 +137,17 @@ class Activite
     public function setArtiste(Artiste $artiste): self
     {
         $this->artiste = $artiste;
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
         return $this;
     }
 }

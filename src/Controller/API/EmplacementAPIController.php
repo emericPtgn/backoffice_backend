@@ -2,23 +2,28 @@
 
 namespace App\Controller\API;
 use App\Service\EmplacementService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
-class EmplacementAPIController {
+class EmplacementAPIController extends AbstractController{
 
     private EmplacementService $emplacementService;
+    private SerializerInterface $serializer;
 
-    public function __construct(EmplacementService $emplacementService){
+    public function __construct(EmplacementService $emplacementService, SerializerInterface $serializer){
         $this->emplacementService = $emplacementService;
+        $this->serializer = $serializer;
     }
 
     #[Route('/api/emplacement', name: 'api_emplacement_addNew', methods: ['POST'])]
     public function addEmplacement(Request $request){
         $requestDatas = json_decode($request->getContent(), true);
         $newEmplacement = $this->emplacementService->addNewEmplacement($requestDatas);
-        return new JsonResponse($newEmplacement, 200, [], false);
+        $serializedEmplacement = $this->serializer->serialize($newEmplacement, 'json', ['groups' => 'emplacement']);
+        return new JsonResponse($serializedEmplacement, 200, [], true);
     }
 
     #[Route('/api/emplacement/{id}', name: 'api_emplacement_update', methods: ['PUT'])]
@@ -31,13 +36,15 @@ class EmplacementAPIController {
     #[Route('/api/emplacement/{id}', name: 'api_emplacement_get', methods: ['GET'])]
     public function getEmplacement(string $id){
         $emplacement = $this->emplacementService->getEmplacement($id);
-        return new JsonResponse($emplacement, 200, [], false);
+        $serializedEmplacement = $this->serializer->serialize($emplacement, 'json', ['groups' => 'emplacement']);
+        return new JsonResponse($serializedEmplacement, 200, [], true);
     }
 
     #[Route('/api/emplacement', name: 'api_emplacement_getAll', methods: ['GET'])]
-    public function getAllEmplacements(string $id){
+    public function getAllEmplacements(){
         $allEmplacements = $this->emplacementService->getAllEmplacements();
-        return new JsonResponse($allEmplacements, 200, [], false);
+        $serializedEmplacement = $this->serializer->serialize($allEmplacements, 'json', ['groups' => 'emplacement']);
+        return new JsonResponse($serializedEmplacement, 200, [], true);
     }
 
 }

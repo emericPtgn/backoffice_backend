@@ -3,30 +3,38 @@
 namespace App\Document;
 
 use App\Repository\CommerceRepository;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 #[MongoDB\Document(repositoryClass: CommerceRepository::class, collection: 'commerce')]
 class Commerce
 {
     #[MongoDB\Id]
+    #[Groups(["commerce"])]
     private string $id;
 
     #[MongoDB\Field(type: "string")]
+    #[Groups(["commerce"])]
     private string $nom;
 
     #[MongoDB\Field(type: "string")]
+    #[Groups(["commerce"])]
     private string $description;
 
     #[MongoDB\EmbedOne(targetDocument: Emplacement::class)]
+    #[Groups(["commerce"])]
     private Emplacement $emplacement;
 
     #[MongoDB\Field(type: "string")]
+    #[Groups(["commerce"])]
     private string $reseauSocial;
 
     #[MongoDB\ReferenceOne(targetDocument: TypeCommerce::class)]
+    #[Groups(["commerce"])]
     private TypeCommerce $typeCommerce;
 
     #[MongoDB\ReferenceOne(targetDocument: TypeProduit::class)]
+    #[Groups(["commerce"])]
     private TypeProduit $typeProduit;
 
     public function getId(): string

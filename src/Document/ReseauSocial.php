@@ -10,19 +10,19 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 class ReseauSocial {
 
     #[MongoDB\Id(strategy:"AUTO")]
-    private string $id; 
+    private ?string $id = null; 
 
     #[MongoDB\Field(type: 'string', name: 'plateforme')]
-    private string $plateforme;
+    private ?string $plateforme = null;
 
     #[MongoDB\Field(type: 'string', name: 'url')]
-    private string $url;
+    private ?string $url = null;
     
     #[MongoDB\Field(type: 'string', name: 'pseudo')]
-    private string $pseudo;
+    private ?string $pseudo = null;
 
     #[MongoDB\Field(type:'string', name: 'icone_url')]
-    private string $icone;
+    private ?string $icone = null;
 
     // Getter pour id
     public function getId(): string

@@ -4,24 +4,30 @@ namespace App\Document;
 
 use App\Repository\MarkerRepository;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[MongoDB\Document(repositoryClass: MarkerRepository::class, collection: 'marker')]
 class Marker
 {
 
     #[MongoDB\Id]
+    #[Groups(['emplacement'])]
     private string $id;
 
     #[MongoDB\Field(type: "string")]
+    #[Groups(['emplacement'])]
     private string $nom;
 
     #[MongoDB\Field(type: "string")]
+    #[Groups(['emplacement'])]
     private string $description;
 
     #[MongoDB\Field(type: "string")]
+    #[Groups(['emplacement'])]
     private string $icone;
 
     #[MongoDB\EmbedOne(targetDocument: Emplacement::class)]
+    #[Groups(['emplacement'])]
     private Emplacement $emplacement;
 
     // Getters and setters...

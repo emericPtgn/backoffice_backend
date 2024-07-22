@@ -2,6 +2,9 @@
 
 namespace App\Service;
 use App\Document\Commerce;
+use App\Document\Emplacement;
+use App\Document\TypeCommerce;
+use App\Document\TypeProduit;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class CommerceService {
@@ -21,16 +24,47 @@ class CommerceService {
             $newCommerce->setDescription($requestDatas['description']);
         }
         if(isset($requestDatas['emplacement'])){
-            $newCommerce->setEmplacement($requestDatas['emplacement']);
+            $nom = $requestDatas['emplacement']['nom'];
+            $lat = $requestDatas['emplacement']['latitude'];
+            $long = $requestDatas['emplacement']['longitude'];
+            $emplacement = new Emplacement($nom, $lat, $long);
+            $newCommerce->setEmplacement($emplacement);
+
         }
         if(isset($requestDatas['typeCommerce'])){
-            $newCommerce->setTypeCommerce($requestDatas['typeCommerce']);
+            if(isset($requestDatas['typeCommerce']['id'])){
+                $typeCommerce = $this->dm->getRepository(TypeCommerce::class)->find(['typeCommerce']['id']);
+                $newCommerce->setTypeCommerce($typeCommerce);
+            } else {
+                $newTypeCommerce = new TypeCommerce();
+                if(isset($requestDatas['typeCommerce']['nom'])){
+                    $newTypeCommerce->setNom($requestDatas['typeCommerce']['nom']);
+                }
+                if(isset($requestDatas['typeCommerce']['icone'])){
+                    $newTypeCommerce->setIcone($requestDatas['typeCommerce']['icone']);
+                }
+                $this->dm->persist($newTypeCommerce);
+                $newCommerce->setTypeCommerce($newTypeCommerce);
+            }            
         }
         if(isset($requestDatas['reseauSocial'])){
             $newCommerce->setReseauSocial($requestDatas['reseauSocial']);
         }
         if(isset($requestDatas['typeProduit'])){
-            $newCommerce->setTypeProduit($requestDatas['typeProduit']);
+            if(isset($requestDatas['typeProduit']['id'])){
+                $typeProduit = $this->dm->getRepository(TypeProduit::class)->find(['typeProduit']['id']);
+                $newCommerce->setTypeProduit($typeProduit);
+            } else {
+                $newTypeProduit = new TypeProduit();
+                if(isset($requestDatas['typeProduit']['nom'])){
+                    $newTypeProduit->setNom($requestDatas['typeProduit']['nom']);
+                }
+                if(isset($requestDatas['typeProduit']['icone'])){
+                    $newTypeProduit->setIcone($requestDatas['typeProduit']['icone']);
+                }
+                $this->dm->persist($newTypeProduit);
+                $newCommerce->setTypeProduit($newTypeProduit);
+            }            
         }
         $this->dm->persist($newCommerce);
         $this->dm->flush();

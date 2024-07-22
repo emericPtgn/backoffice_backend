@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Service;
+use App\Document\Emplacement;
 use App\Document\Marker;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -19,7 +20,17 @@ class MarkerService {
             $newMarker->setNom($requestDatas['nom']);
         }
         if(isset($requestDatas['emplacement'])){
-            $newMarker->setEmplacement($requestDatas['emplacement']);
+            if(isset($requestDatas['emplacement']['id'])){
+                $emplacement = $this->dm->getRepository(Emplacement::class)->find($requestDatas['emplacement']['id']);
+                $newMarker->setEmplacement($emplacement);
+            } else {
+                $emplacement = new Emplacement();
+                $emplacement->setNom($requestDatas['emplacement']['nom']);
+                $emplacement->setLatitude($requestDatas['emplacement']['latitude']);
+                $emplacement->setLongitude($requestDatas['emplacement']['longitude']);
+                $this->dm->persist($emplacement);
+                $newMarker->setEmplacement($emplacement);
+            }
         }
         if(isset($requestDatas['icone'])){
             $newMarker->setIcone($requestDatas['icone']);
