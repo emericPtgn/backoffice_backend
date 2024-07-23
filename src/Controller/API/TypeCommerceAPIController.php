@@ -2,23 +2,28 @@
 
 namespace App\Controller\API;
 use App\Service\TypeCommerceService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 
-class TypeCommerceAPIController {
+class TypeCommerceAPIController extends AbstractController{
 
     private TypeCommerceService $typeCommerceService;
+    private SerializerInterface $serializer;
 
-    public function __construct(TypeCommerceService $typeCommerceService){
+    public function __construct(TypeCommerceService $typeCommerceService, SerializerInterface $serializer){
         $this->typeCommerceService = $typeCommerceService;
+        $this->serializer = $serializer;
     }
 
     #[Route('/api/type_commerce', name: 'api_typeCommerce_addNew', methods: ['POST'])]
     public function addNewtypeCommerce(Request $request) : JsonResponse {
         $requestDatas = json_decode($request->getContent(), true);
         $newtypeCommerce = $this->typeCommerceService->addNewType($requestDatas);
-        return new JsonResponse($newtypeCommerce, 200, [], false);
+        $serializedTypeCommerce = $this->serializer->serialize($newtypeCommerce, 'json', ['groups' => 'commerce']);
+        return new JsonResponse($serializedTypeCommerce, 200, [], true);
     }
 
     #[Route('/api/type_commerce/{id}', name: 'api_typeCommerce_update', methods: ['PUT'])]
@@ -31,13 +36,15 @@ class TypeCommerceAPIController {
     #[Route('/api/type_commerce/{id}', name: 'api_typeCommerce_get', methods: ['GET'])]
     public function getTypeCommerce(string $id) : JsonResponse {
         $typeCommerce = $this->typeCommerceService->getTypeCommerce($id);
-        return new JsonResponse($typeCommerce, 200, [], false);
+        $serializedTypeCommerce = $this->serializer->serialize($typeCommerce, 'json', ['groups' => 'commerce']);
+        return new JsonResponse($serializedTypeCommerce, 200, [], true);
     }
 
     #[Route('/api/type_commerce', name: 'api_typeCommerce_getAll', methods: ['GET'])]
     public function getAllTypesCommerces() : JsonResponse {
         $allTypesCommerces = $this->typeCommerceService->getAllTypesCommerces();
-        return new JsonResponse($allTypesCommerces, 200, [], false);
+        $serializedTypesCommerces = $this->serializer->serialize($allTypesCommerces, 'json', ['groups' => 'commerce']);
+        return new JsonResponse($serializedTypesCommerces, 200, [], true);
     }
 
     #[Route('/api/type_commerce/{id}', name: 'api_typeCommerce_remove', methods: ['DELETE'])]

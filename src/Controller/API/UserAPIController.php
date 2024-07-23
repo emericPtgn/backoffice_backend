@@ -3,8 +3,7 @@
 namespace App\Controller\API;
 
 use App\Service\UserService;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Component\Mime\Email;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -14,9 +13,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class UserAPIController extends AbstractController
 {
     private UserService $userService;
+    private SerializerInterface $serializer;
 
-    public function __construct(UserService $userService){
+    public function __construct(UserService $userService, SerializerInterface $serializer){
         $this->userService = $userService;
+        $this->serializer = $serializer;
     }
 
 
@@ -52,7 +53,8 @@ class UserAPIController extends AbstractController
     public function getUsers()
     {
         $response = $this->userService->getUsers();
-        return new JsonResponse($response, 200, [], false);
+        $serializedResponse = $this->serializer->serialize($response, 'json');
+        return new JsonResponse($serializedResponse, 200, [], true);
     }
 
 

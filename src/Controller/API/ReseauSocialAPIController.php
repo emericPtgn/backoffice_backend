@@ -2,21 +2,26 @@
 
 namespace App\Controller\API;
 use App\Service\ReseauSocialService;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 
-class ReseauSocialAPIController {
+class ReseauSocialAPIController extends AbstractController {
     private ReseauSocialService $reseauSocialService;
-    public function __construct(ReseauSocialService $reseauSocialService){
+    private SerializerInterface $serializer;
+    public function __construct(ReseauSocialService $reseauSocialService, SerializerInterface $serializer){
         $this->reseauSocialService = $reseauSocialService;
+        $this->serializer = $serializer;
     }   
-
+    
     #[Route('/api/social', name: 'api_social_new', methods: ['POST'])]
     public function addNewSocial(Request $request){
         $requestDatas = json_decode($request->getContent(), true);
         $newReseauSocial = $this->reseauSocialService->addNewSocial($requestDatas);
-        return new JsonResponse($newReseauSocial, 200, [], false);
+        $serializedReseauSocial = $this->serializer->serialize($newReseauSocial, 'json');
+        return new JsonResponse($serializedReseauSocial, 200, [], true);
     }
 
     #[Route('/api/social/{id}', name: 'api_social_update', methods: ['PUT'])]
@@ -29,13 +34,15 @@ class ReseauSocialAPIController {
     #[Route('/api/social/{id}', name: 'api_social_get', methods: ['GET'])]
     public function getSocial(string $id){
         $social = $this->reseauSocialService->getSocial($id);
-        return new JsonResponse($social, 200, [], false);
+        $serializedSocial = $this->serializer->serialize($social, 'json');
+        return new JsonResponse($serializedSocial, 200, [], true);
     }
 
     #[Route('/api/social', name: 'api_social_getAll', methods: ['GET'])]
     public function getAllSocials(string $id){
         $socials = $this->reseauSocialService->getAllSocials();
-        return new JsonResponse($socials, 200, [], false);
+        $serializedSocials = $this->serializer->serialize($socials, 'json');
+        return new JsonResponse($serializedSocials, 200, [], false);
     }
 
 }

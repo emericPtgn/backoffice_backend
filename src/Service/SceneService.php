@@ -2,6 +2,7 @@
 
 namespace App\Service;
 use App\Document\Scene;
+use App\Document\Emplacement;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class SceneService {
@@ -16,7 +17,18 @@ class SceneService {
             $newScene->setNom($requestDatas['nom']);
         }
         if(isset($requestDatas['emplacement'])){
-            $newScene->setEmplacement($requestDatas['emplacement']);
+            $emplacement = new Emplacement();
+            if(isset($requestDatas['emplacement']['nom'])){
+                $emplacement->setNom($requestDatas['emplacement']['nom']);
+            }
+            if(isset($requestDatas['emplacement']['latitude'])){
+                $emplacement->setLatitude($requestDatas['emplacement']['latitude']);
+            }
+            if(isset($requestDatas['emplacement']['longitude'])){
+                $emplacement->setLongitude($requestDatas['emplacement']['longitude']);
+            }
+            $this->dm->persist($emplacement);    
+            $newScene->setEmplacement($emplacement);
         }
         $this->dm->persist($newScene);
         $this->dm->flush();
