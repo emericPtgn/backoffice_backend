@@ -5,6 +5,7 @@ namespace App\Document;
 use App\Repository\UserRepository;
 use App\Security\Roles;
 use DateTime;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -16,11 +17,14 @@ use App\Validator\ValidRoles;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[MongoDB\Id]
+    #[Groups(['user'])]
     private string $id;
 
     #[MongoDB\Field(type: 'string')]
     #[Assert\NotBlank]
     #[Assert\Email]
+    #[Assert\Unique(fields:['email'], message: 'This email is already in use.')]
+    #[Groups(['user'])]
     private ?string $email = null;
 
     #[MongoDB\Field(type: 'string')]
@@ -28,21 +32,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[MongoDB\Field(type: 'collection')]
+    #[Groups(['user'])]
     private array $roles = [];
 
     #[MongoDB\Field(type: 'string')]
+    #[Groups(['user'])]
     private ?string $nom = null;
 
     #[MongoDB\Field(type: 'collection')]
+    #[Groups(['user'])]
     private ?array $groupes = [];
 
     #[MongoDB\Field(type: 'date')]
+    #[Groups(['user'])]
     private ?DateTime $dateCreation = null;
 
     #[MongoDB\Field(type: 'date')]
+    #[Groups(['user'])]
     private ?DateTime $dateModification = null;
 
     #[MongoDB\Field(type: 'boolean')]
+    #[Groups(['user'])]
     private bool $isVerified = false;
 
     #[MongoDB\Field(type: 'string')]

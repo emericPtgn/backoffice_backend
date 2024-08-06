@@ -2,12 +2,15 @@
 
 namespace App\Service;
 use App\Document\ReseauSocial;
+use App\Repository\ReseauSocialRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class ReseauSocialService {
     private DocumentManager $dm;
-    public function __construct(DocumentManager $dm){
+    private ReseauSocialRepository $reseauSocialRepo;
+    public function __construct(DocumentManager $dm, ReseauSocialRepository $reseauSocialRepo){
         $this->dm = $dm;
+        $this->reseauSocialRepo = $reseauSocialRepo;
     }
     public function addNewSocial(array $requestDatas){
         $newReseauSocial = new ReseauSocial();
@@ -65,5 +68,9 @@ class ReseauSocialService {
             return ['message' => 'no socials found, create a new one!'];
         }
         return $allSocials;
+    }
+
+    public function deleteSocial(string $id){
+        return $this->reseauSocialRepo->deleteSocial($id);
     }
 }

@@ -45,4 +45,12 @@ class ReseauSocialAPIController extends AbstractController {
         return new JsonResponse($serializedSocials, 200, [], false);
     }
 
+    #[Route('/api/social', name: 'api_social_delete', methods: ['DELETE'])]
+    public function deleteSocial(string $id){
+        $response = $this->reseauSocialService->deleteSocial($id);
+        $serializedResponse = $this->serializer->serialize($response, 'json');
+        return new JsonResponse($serializedResponse, 200, [], true);
+    }
+
+
 }

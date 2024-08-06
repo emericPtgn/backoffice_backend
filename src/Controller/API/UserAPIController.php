@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Service\UserService;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,7 +21,7 @@ class UserAPIController extends AbstractController
         $this->serializer = $serializer;
     }
 
-
+    #[IsGranted('ROLE_ADMIN', '', 'you do not have access to users informations')]
     #[Route('/api/user', name: 'api_user_new_user', methods: ['POST'])]
     public function addUser(Request $request) : JsonResponse
     {
@@ -29,25 +30,29 @@ class UserAPIController extends AbstractController
             return new JsonResponse(['erreor' => 'invalid Json'], Response::HTTP_BAD_REQUEST);
         }
         $response = $this->userService->addUser($requestDatas);
-        return new JsonResponse($response, 200, [], false);
+        $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'user']);
+        return new JsonResponse($serializedResponse, 200, [], true);
     }
 
-    #[Route('/api/user', name: 'api_user_remove_user', methods: ['DELETE'])]
-    public function removeUser(Request $request)
+    #[IsGranted('ROLE_ADMIN', '', 'you do not have access to users informations')]
+    #[Route('/api/user/{id}', name: 'api_user_remove_user', methods: ['DELETE'])]
+    public function deleteUser(string $id)
     {
-        $username = $request->query->get('username');
-        $response = $this->userService->removeUser($username);
-        return new JsonResponse($response, 200, [], false);
+        $response = $this->userService->deleteUser($id);
+        $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'user']);
+        return new JsonResponse($serializedResponse, 200, [], true);
     }
 
-    #[Route('/api/user', name: 'api_user_update_user', methods: ['PUT'])]
-    public function updateUser(Request $request)
+    #[Route('/api/user/{id}', name: 'api_user_update_user', methods: ['PUT'])]
+    public function updateUser(Request $request, string $id)
     {
         $requestDatas = json_decode($request->getContent(), true);
-        $response = $this->userService->updateUser($requestDatas);
-        return new JsonResponse($response, 200, [], false);
+        $response = $this->userService->updateUser($requestDatas, $id);
+        $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'user']);
+        return new JsonResponse($serializedResponse, 200, [], true);
     }
 
+    #[IsGranted('ROLE_ADMIN', null, 'you do not have access to users informations')]
     #[Route('/api/user', name: 'api_user_get_user', methods: ['GET'])]
     // declaration getUserDatas because of getUser from abstractController 
     public function getUsers()

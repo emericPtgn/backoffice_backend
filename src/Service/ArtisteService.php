@@ -2,6 +2,9 @@
 
 namespace App\Service;
 use App\Document\Artiste;
+use App\Document\Activite;
+use App\Document\Emplacement;
+use App\Document\ReseauSocial;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class ArtisteService {
@@ -24,8 +27,19 @@ class ArtisteService {
         if(isset($requestDatas['style'])){
             $artiste->setStyle($requestDatas['style']);
         }
-        if(isset($requestDatas['reseauSocial'])){
-            $artiste->addReseauSocial($requestDatas['reseauSocial']);
+        if(isset($requestDatas['reseauxSociaux']) && is_array($requestDatas['reseauxSociaux'])){
+            foreach($requestDatas['reseauxSociaux'] as $socialData){
+                $social = $this->dm->getRepository(ReseauSocial::class)->findOneBy(['url' => $socialData['url']]);
+                
+                if(!$social){
+                    $social = new ReseauSocial();
+                    $social->setPlateforme($socialData['plateforme']);
+                    $social->setUrl($socialData['url']);
+                    $this->dm->persist($social);
+                }
+                
+                $artiste->addReseauSocial($social);
+            }
         }
         $this->dm->persist($artiste);
         $this->dm->flush();
@@ -40,6 +54,7 @@ class ArtisteService {
             return ['mesage' => 'no artiste found'];
         } else {
             $this->dm->remove($artiste);
+            $this->dm->flush();
             return ['message' => 'artiste removed successfully'];
         }
     }
@@ -60,11 +75,24 @@ class ArtisteService {
             if(isset($requestDatas['style'])){
                 $artiste->setStyle($requestDatas['style']);
             }
-            if(isset($requestDatas['style'])){
-                $artiste->addReseauSocial($requestDatas['style']);
+            if(isset($requestDatas['reseauxSociaux']) && is_array($requestDatas['reseauxSociaux'])){
+                $reseauxSociauxCollection = $artiste->getReseauxSociaux();
+                foreach ($reseauxSociauxCollection as $reseauSocial) {
+                    $artiste->removeReseauSocial($reseauSocial);
+                }
+
+                foreach($requestDatas['reseauxSociaux'] as $socialData){
+                
+                    $existSocial = new ReseauSocial();
+                    $existSocial->setPlateforme($socialData['plateforme']);
+                    $existSocial->setUrl($socialData['url']);
+                    $this->dm->persist($existSocial);
+                    $artiste->addReseauSocial($existSocial);
+            }
             }
             $this->dm->persist($artiste);
             $this->dm->flush();
+            return $artiste;
         }
     }
 

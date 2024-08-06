@@ -9,14 +9,15 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[MongoDB\Document(repositoryClass: "App\Repository\ArtisteRepository", collection:'artiste')]
+#[MongoDB\UniqueIndex(keys: ['nom' => 'asc'], options: ['unique' => true])]
 class Artiste
 {
     #[MongoDB\Id(strategy: "AUTO")]
-    #[Groups(["artiste", "activite"])]
+    #[Groups(["artiste", "activite", "programmation"])]
     protected string $id;
 
     #[MongoDB\Field(type: 'string', name: 'nom')]
-    #[Groups(["artiste", "activite"])]
+    #[Groups(["artiste", "activite", "programmation"])]
     protected string $nom;
 
     #[MongoDB\Field(type: 'string', name: 'style')]
@@ -28,12 +29,15 @@ class Artiste
     protected string $description;
 
     #[MongoDB\EmbedMany(targetDocument: ReseauSocial::class)]
+    #[Groups(["artiste", "social"])]
     protected Collection $reseauxSociaux;
 
-    #[MongoDB\EmbedMany(targetDocument: Activite::class)]
-    #[Groups(["artiste"])]
-    protected Collection $activites;
 
+    public function __construct()
+    {
+        $this->reseauxSociaux = new ArrayCollection();
+    }
+    
     public function __tostring() : string {
         return $this->nom;
     }
@@ -91,26 +95,6 @@ class Artiste
     public function removeReseauSocial(ReseauSocial $reseauSocial): self
     {
         $this->reseauxSociaux->removeElement($reseauSocial);
-        return $this;
-    }
-
-    public function getActivites(): Collection
-    {
-        return $this->activites;
-    }
-
-    public function addActivites(ReseauSocial $activites): self
-    {
-        if (!$this->activites->contains($activites)) {
-            $this->activites->add($activites);
-        }
-
-        return $this;
-    }
-
-    public function removeActivite(Activite $activites): self
-    {
-        $this->activites->removeElement($activites);
         return $this;
     }
 

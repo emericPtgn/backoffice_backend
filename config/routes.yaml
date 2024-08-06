@@ -20,27 +20,92 @@ app_homepage:
 
 # config/routes.yaml
 
+
+# ----------- API ACTIVITY ----------- #
+
+api_activity_new_activity:
+    path: /api/activity
+    controller: App\Controller\API\ActiviteAPIController::addActivity
+    methods: ['POST']
+
+api_activity_update_activity:
+    path: /api/activity/{id}
+    controller: App\Controller\API\ActiviteAPIController::updateActivity
+    methods: ['PUT']
+
+api_activity_delete_activity:
+    path: /api/activity/{id}
+    controller: App\Controller\API\ActiviteAPIController::deleteActivity
+    methods: ['DELETE']
+
+api_activity_get_activity:
+    path: /api/activity/{id}
+    controller: App\Controller\API\ActiviteAPIController::getActivity
+    methods: ['GET']
+
+api_activity_get_activities:
+    path: /api/activity
+    controller: App\Controller\API\ActiviteAPIController::getActivities
+    methods: ['GET']
+
+
+# ------------- #
+
+api_programmation_addnew:
+    path: /api/programmation
+    controller: App\Controller\API\ProgrammationAPIController::addProgrammation
+    methods: ['POST']
+    
+api_programmation_delete:
+    path: /api/programmation/{id}
+    controller: App\Controller\API\ProgrammationAPIController::deleteProgrammation
+    methods: ['DELETE']
+
+api_programmation_get:
+    path: /api/programmation/{id}
+    controller: App\Controller\API\ProgrammationAPIController::getProgrammation
+    methods: ['GET']
+
+api_programmation_get_liste:
+    path: /api/programmation
+    controller: App\Controller\API\ProgrammationAPIController::getAllProgrammations
+    methods: ['GET']
+
+api_programmation_update:
+    path: /api/programmation/{id}
+    controller: App\Controller\API\ProgrammationAPIController::updateProgrammation
+    methods: ['PUT']
+
+
+# ----------- USER ------------- #
+
 app_registration:
     path: /account
     controller: App\Controller\AccountController::registerAction
 
 
 api_user_new_user:
-    path: /api/user/addnew
+    path: /api/user
     controller: App\Controller\UserController::addUser
     methods: ['POST']
 
 
-api_user_remove_user:
-    path: /api/user/remove
-    controller: App\Controller\UserController::removeUser
+api_user_delete_user:
+    path: /api/user/{id}
+    controller: App\Controller\UserController::deleteUser
     methods: ['DELETE']
 
+api_user_update_user:
+    path: /api/user/{id}
+    controller: App\Controller\UserController::updateUser
+    methods: ['PUT']
 
-api_activity_new_activity:
-    path: /api/activity
-    controller: App\Controller\API\ActiviteAPIController::addActivity
-    methods: ['POST']
+api_user_get_users:
+    path: /api/user
+    controller: App\Controller\UserController::getUsers
+    methods: ['GET']
+
+
 
 api_commerce_addCommerce:
     path: /api/commerce

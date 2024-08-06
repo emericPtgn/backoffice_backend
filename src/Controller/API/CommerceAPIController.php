@@ -41,7 +41,7 @@ class CommerceAPIController extends AbstractController {
         return new JsonResponse($serializedCommerce, 200, [], true);
     }
 
-    #[Route('/api/commerce', name:'api_commerce_getAllConcerts', methods: ['GET'])]
+    #[Route('/api/commerce', name:'api_commerce_getAllCommerces', methods: ['GET'])]
     public function getAllCommerces() : JsonResponse {
         $listCommerces = $this->commerceService->getAllCommerces();
         $serializedList = $this->serializer->serialize($listCommerces, 'json', ['groups' => 'commerce']);

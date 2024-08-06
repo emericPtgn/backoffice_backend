@@ -24,11 +24,11 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\Repository\ArtisteRepository:
-        class: App\Repository\ArtisteRepository
-        arguments:
-            - '@doctrine_mongodb.odm.document_manager'
-        tags: ['doctrine.repository_service']
+    # App\Repository\ArtisteRepository:
+    #     class: App\Repository\ArtisteRepository
+    #     arguments:
+    #         - '@doctrine_mongodb.odm.document_manager'
+    #     tags: ['doctrine.repository_service']
 
     App\EventListener\AuthenticationSuccessListener:
         tags:
@@ -39,3 +39,14 @@ services:
         public: true
         autowire: true
         autoconfigure: true
+
+    App\Repository\ActiviteRepository:
+        arguments:
+            $dm: '@doctrine_mongodb.odm.document_manager'
+        calls:
+            - setLogger: ['@logger']
+
+
+    App\EventListener\ExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }

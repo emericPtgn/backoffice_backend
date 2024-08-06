@@ -27,7 +27,7 @@ class ArtisteAPIController extends AbstractController {
     public function addArtiste(Request $request) : JsonResponse {
         $requestDatas = json_decode($request->getContent(), true);
         $artiste = $this->artisteService->addArtiste($requestDatas);
-        $serializedArtiste = $this->serializer->serialize($artiste, 'json');
+        $serializedArtiste = $this->serializer->serialize($artiste, 'json', ['groups' => 'artiste', 'social']);
         return new JsonResponse($serializedArtiste, 200, [], true);
     }
 
@@ -39,21 +39,23 @@ class ArtisteAPIController extends AbstractController {
 
     #[Route('/api/artiste/{id}', name: 'app_artiste_update', methods:['PUT'])]
     public function updateArtiste(Request $request, string $id) : JsonResponse {
-        $requestDatas = json_decode($request->getContent(), false);
+        $requestDatas = json_decode($request->getContent(), true);
         $response = $this->artisteService->updateArtiste($id,$requestDatas);
-        return new JsonResponse($response, 200, [], false);
+        $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'artiste', 'activite', "social"]);
+        return new JsonResponse($serializedResponse, 200, [], true);
     }
 
     #[Route('/api/artiste/{id}', name: 'app_artiste_get', methods:['GET'])]
     public function getArtiste(string $id) : JsonResponse {
         $response = $this->artisteService->getArtiste($id);
-        return new JsonResponse($response, 200, [], false);
+        $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'artiste', 'activite', 'social']);
+        return new JsonResponse($serializedResponse, 200, [], true);
     }
 
     #[Route('/api/artiste', name: 'app_artiste_get_liste', methods:['GET'])]
     public function getListeArtistes() : JsonResponse {
         $response = $this->artisteService->getArtistes();
-        $serializedResponse = $this->serializer->serialize($response, 'json');
+        $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'artiste', 'activite', 'social']);
         return new JsonResponse($serializedResponse, 200, [], true);
     }
 

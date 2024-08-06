@@ -26,11 +26,14 @@ class SceneAPIController extends AbstractController {
         $serializedScene = $this->serializer->serialize($newScene, 'json');
         return new JsonResponse($serializedScene, 200, [], true);
     }
+
+    
     #[Route('/api/scene/{id}', name: 'api_scene_update', methods: ['PUT'])]
     public function updateScene(string $id, Request $request){
         $requestDatas = json_decode($request->getContent(), true);
         $updatedScene = $this->sceneService->updateScene($id, $requestDatas);
-        return new JsonResponse($updatedScene, 200, [], false);
+        $serializedScene = $this->serializer->serialize($updatedScene, 'json');
+        return new JsonResponse($serializedScene, 200, [], true);
     }
     #[Route('/api/scene/{id}', name: 'api_scene_get', methods: ['GET'])]
     public function getScene(string $id){
@@ -39,7 +42,7 @@ class SceneAPIController extends AbstractController {
         return new JsonResponse($serializedScene, 200, [], true);
     }
     #[Route('/api/scene', name: 'api_scene_getAll', methods: ['GET'])]
-    public function getAllScenes(string $id){
+    public function getAllScenes(){
         $allScenes = $this->sceneService->getAllScenes();
         $serializedScenes = $this->serializer->serialize($allScenes, 'json');
         return new JsonResponse($serializedScenes, 200, [], true);

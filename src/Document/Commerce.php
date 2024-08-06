@@ -21,13 +21,13 @@ class Commerce
     #[Groups(["commerce"])]
     private string $description;
 
-    #[MongoDB\EmbedOne(targetDocument: Emplacement::class)]
-    #[Groups(["commerce"])]
-    private Emplacement $emplacement;
-
     #[MongoDB\Field(type: "string")]
     #[Groups(["commerce"])]
     private string $reseauSocial;
+
+    #[MongoDB\EmbedOne(targetDocument: Emplacement::class)]
+    #[Groups(["commerce"])]
+    private Emplacement $emplacement;
 
     #[MongoDB\ReferenceOne(targetDocument: TypeCommerce::class)]
     #[Groups(["commerce"])]

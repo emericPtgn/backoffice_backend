@@ -30,7 +30,8 @@ class TypeCommerceAPIController extends AbstractController{
     public function updateTypeCommerce(string $id, Request $request) : JsonResponse {
         $requestDatas = json_decode($request->getContent(), true);
         $newTypeCommerce = $this->typeCommerceService->updateTypeCommerce($id, $requestDatas);
-        return new JsonResponse($newTypeCommerce, 200, [], false);
+        $serializedTypeCommerce = $this->serializer->serialize($newTypeCommerce, 'json', ['groups' => 'commerce']);
+        return new JsonResponse($serializedTypeCommerce, 200, [], true);
     }
 
     #[Route('/api/type_commerce/{id}', name: 'api_typeCommerce_get', methods: ['GET'])]

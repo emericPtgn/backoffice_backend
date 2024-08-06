@@ -3,18 +3,22 @@
 namespace App\Document;
 
 use App\Repository\SceneRepository;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 #[MongoDB\Document(repositoryClass: SceneRepository::class, collection :'scene')]
 class Scene
 {
     #[MongoDB\Id]
+    #[Groups(['scene', 'emplacement'])]
     private string $id;
 
     #[MongoDB\Field(type: "string")]
+    #[Groups(['scene', 'emplacement'])]
     private string $nom;
 
     #[MongoDB\EmbedOne(targetDocument: Emplacement::class)]
+    #[Groups(['scene', 'emplacement'])]
     private Emplacement $emplacement;
 
     // Getter and Setter methods
