@@ -2,70 +2,64 @@
 
 namespace App\Document;
 
-use App\Document\Artiste;
-use App\Document\Emplacement;
-use App\Repository\ActiviteRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
-#[MongoDB\Document(repositoryClass: ActiviteRepository::class, collection: 'activite')]
+#[MongoDB\Document(repositoryClass: "App\Repository\ActiviteRepository", collection: "activite")]
 class Activite
 {
-    #[MongoDB\Id]
-    #[Groups(["activite", "programmation"])]
-    private ?string $id;
+    #[MongoDB\Id(strategy: "AUTO")]
+    #[Groups(["activite", "artiste"])]
+    protected ?string $id = null;
 
-    #[MongoDB\Field(type: "string")]
-    #[Groups(["activite", "programmation"])]
-    private ?string $nom = null;
+    #[MongoDB\Field(type: 'string', name: 'nom')]
+    #[Groups(["activite", "artiste"])]
+    protected ?string $nom = null;
 
-    #[MongoDB\Field(type: "date")]
-    #[Groups(["activite", "programmation"])]
-    private ?\DateTime $date = null;
+    #[MongoDB\Field(type: 'date', name: 'date')]
+    #[Groups(["activite", "artiste"])]
+    protected ?\DateTime $date = null;
 
-    #[MongoDB\Field(type: "string")]  // Changer le type en "string"
-    #[Groups(["activite", "programmation"])]
-    private ?string $formattedDate = null;
+    #[MongoDB\Field(type: 'string', name: 'formattedDate')]
+    #[Groups(["activite", "artiste"])]
+    protected ?string $formattedDate = null;
 
-    #[MongoDB\Field(type: "int", name: 'duree_minutes')]
-    #[Groups(["activite"])]
-    private ?int $duree_min = null;
-
-    #[MongoDB\Field(type: "string")]
-    #[Groups(["activite", "programmation"])]
-    private ?string $type = null; // Peut être 'concert', 'dedicace', 'jeu divers'
+    #[MongoDB\Field(type: 'string', name: 'type')]
+    #[Groups(["activite", "artiste"])]
+    protected ?string $type = null;
 
     #[MongoDB\Field(type: 'string', name: 'description')]
-    #[Groups(["activite"])]
+    #[Groups(["activite", "artiste"])]
     protected ?string $description = null;
 
-    #[MongoDB\ReferenceOne(targetDocument: Emplacement::class)]
+    #[MongoDB\ReferenceOne(targetDocument: Marker::class)]
+    #[Groups(["activite", "artiste"])]
+    private ?Marker $marker = null;
+
+    #[MongoDB\ReferenceMany(targetDocument: Artiste::class, cascade: 'persist')]
     #[Groups(["activite"])]
-    private ?Emplacement $emplacement = null;
+    #[MaxDepth(1)]
+    private ?Collection $artistes = null;
 
-    #[MongoDB\ReferenceOne(targetDocument: Artiste::class)]
-    #[Groups(["activite", "programmation"])]
-    private ?Artiste $artiste = null;
+    public function __construct()
+    {
+        $this->artistes = new ArrayCollection();
+    }
 
-    // Autres propriétés et méthodes communes...
-
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId(string $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    public function getNom(): string
+    public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom(string $nom): self
+    public function setNom(?string $nom): self
     {
         $this->nom = $nom;
         return $this;
@@ -79,7 +73,6 @@ class Activite
     public function setDate(?\DateTime $date): self
     {
         if ($date) {
-            // Convertir en UTC avant de stocker
             $utcDate = clone $date;
             $utcDate->setTimezone(new \DateTimeZone("UTC"));
             $this->date = $utcDate;
@@ -88,48 +81,17 @@ class Activite
         }
         return $this;
     }
-    
 
     public function getFormattedDate(): ?string
     {
         if (!$this->date) {
             return null;
         }
-    
-        // Convertir la date en UTC pour le stockage
+
         $utcDate = clone $this->date;
         $utcDate->setTimezone(new \DateTimeZone("UTC"));
-    
-        // Formater la date pour le champ datetime-local
-        return $utcDate->format('Y-m-d\TH:i'); // Format ISO 8601 attendu par datetime-local
-    }
-    
-    
 
-    private function formatDate(?\DateTime $date): ?string
-    {
-        if (!$date) {
-            return null;
-        }
-    
-        // Convertir la date UTC en date locale (Europe/Paris)
-        $localDate = clone $date;
-        $localDate->setTimezone(new \DateTimeZone("Europe/Paris")); // Convertir en fuseau horaire local
-    
-        // Formater la date comme souhaité
-        return $localDate->format('Y-m-d\TH:i'); // Utiliser le format ISO 8601 attendu
-    }
-    
-
-    public function getDuree(): ?int
-    {
-        return $this->duree_min;
-    }
-
-    public function setDuree(?int $duree_min): self
-    {
-        $this->duree_min = $duree_min;
-        return $this;
+        return $utcDate->format('Y-m-d\TH:i');
     }
 
     public function getType(): ?string
@@ -143,25 +105,35 @@ class Activite
         return $this;
     }
 
-    public function getEmplacement(): ?Emplacement
+    public function getMarker(): ?Marker
     {
-        return $this->emplacement;
+        return $this->marker;
     }
 
-    public function setEmplacement(?Emplacement $emplacement): self
+    public function setMarker(?Marker $marker): self
     {
-        $this->emplacement = $emplacement;
+        $this->marker = $marker;
         return $this;
     }
 
-    public function getArtiste(): ?Artiste
+    public function getArtistes(): Collection
     {
-        return $this->artiste;
+        return $this->artistes;
     }
 
-    public function setArtiste(?Artiste $artiste): self
+    public function addArtiste(Artiste $artiste): self
     {
-        $this->artiste = $artiste;
+        if (!$this->artistes->contains($artiste)) {
+            $this->artistes->add($artiste);
+        }
+        return $this;
+    }
+
+    public function removeArtiste(Artiste $artiste): self
+    {
+        if ($this->artistes->removeElement($artiste)) {
+            $artiste->removeActivite($this); // Mise à jour bidirectionnelle
+        }
         return $this;
     }
 

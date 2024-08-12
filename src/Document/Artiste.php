@@ -5,42 +5,52 @@ namespace App\Document;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
-use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[MongoDB\Document(repositoryClass: "App\Repository\ArtisteRepository", collection:'artiste')]
+#[MongoDB\Document(repositoryClass: "App\Repository\ArtisteRepository", collection: 'artiste')]
 #[MongoDB\UniqueIndex(keys: ['nom' => 'asc'], options: ['unique' => true])]
 class Artiste
 {
     #[MongoDB\Id(strategy: "AUTO")]
-    #[Groups(["artiste", "activite", "programmation"])]
-    protected string $id;
+    #[Groups(["artiste"])]
+    protected ?string $id = null;
 
     #[MongoDB\Field(type: 'string', name: 'nom')]
-    #[Groups(["artiste", "activite", "programmation"])]
-    protected string $nom;
+    #[Groups(["artiste", "marker"])]
+    #[Assert\Unique]
+    protected ?string $nom = null;
 
-    #[MongoDB\Field(type: 'string', name: 'style')]
-    #[Groups(["artiste", "activite"])]
-    protected string $style;
+    #[MongoDB\Field(type: 'collection', name: 'style')]
+    #[Groups(["artiste"])]
+    protected ?array $styles = null; // Changed type to array
 
     #[MongoDB\Field(type: 'string', name: 'description')]
-    #[Groups(["artiste", "activite"])]
-    protected string $description;
+    #[Groups(["artiste"])]
+    protected ?string $description = null;
 
     #[MongoDB\EmbedMany(targetDocument: ReseauSocial::class)]
-    #[Groups(["artiste", "social"])]
-    protected Collection $reseauxSociaux;
+    #[Groups(["artiste"])]
+    protected ?Collection $reseauxSociaux;
 
+    #[MongoDB\ReferenceMany(targetDocument: Activite::class, cascade:'persist')]
+    #[Groups(["artiste"])]
+    #[MaxDepth(1)]
+    private ?Collection $activities = null;
 
     public function __construct()
     {
+        $this->styles = []; // Changed to empty array
         $this->reseauxSociaux = new ArrayCollection();
+        $this->activities = new ArrayCollection();
     }
-    
-    public function __tostring() : string {
+
+    public function __toString(): string
+    {
         return $this->nom;
     }
+
     public function getId(): ?string
     {
         return $this->id;
@@ -57,14 +67,14 @@ class Artiste
         return $this;
     }
 
-    public function getStyle(): ?string
+    public function getStyles(): ?array
     {
-        return $this->style;
+        return $this->styles;
     }
 
-    public function setStyle(string $style): self
+    public function setStyles(array $styles): self
     {
-        $this->style = $style;
+        $this->styles = $styles;
         return $this;
     }
 
@@ -78,6 +88,7 @@ class Artiste
         $this->description = $description;
         return $this;
     }
+
     public function getReseauxSociaux(): Collection
     {
         return $this->reseauxSociaux;
@@ -88,7 +99,6 @@ class Artiste
         if (!$this->reseauxSociaux->contains($reseauSocial)) {
             $this->reseauxSociaux->add($reseauSocial);
         }
-
         return $this;
     }
 
@@ -98,5 +108,24 @@ class Artiste
         return $this;
     }
 
-    
+    public function getActivities(): Collection
+    {
+        return $this->activities;
+    }
+
+    public function addActivite(Activite $activite): self
+    {
+        if (!$this->activities->contains($activite)) {
+            $this->activities->add($activite);
+        }
+        return $this;
+    }
+
+    public function removeActivite(Activite $activite): self
+    {
+        if ($this->activities->removeElement($activite)) {
+            $activite->removeArtiste($this); // Mise à jour bidirectionnelle
+        }
+        return $this;
+    }
 }

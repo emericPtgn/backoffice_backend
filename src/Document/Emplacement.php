@@ -10,20 +10,22 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 class Emplacement
 {
     #[MongoDB\Id]
-    #[Groups(["activite", "commerce", "emplacement"])]
+    #[Groups(["commerce", "emplacement"])]
     private string $id;
 
     #[MongoDB\Field(type: "string")]
-    #[Groups(["activite", "commerce", "emplacement"])]
+    #[Groups(["commerce", "emplacement"])]
     private string $nom;
 
     #[MongoDB\Field(type: "float")]
-    #[Groups(["activite", "commerce", "emplacement"])]
+    #[Groups(["commerce", "emplacement"])]
     private float $latitude;
 
     #[MongoDB\Field(type: "float")]
-    #[Groups(["activite", "commerce", "emplacement"])]
+    #[Groups(["commerce", "emplacement"])]
     private float $longitude;
+
+
 
     // Getter and Setter methods
 

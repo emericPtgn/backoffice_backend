@@ -22,25 +22,33 @@ class MarkerAPIController extends AbstractController {
     public function addMarker(Request $request){
         $requestDatas = json_decode($request->getContent(), true);
         $newMarker = $this->markerService->addMarker($requestDatas);
-        $serializedMarker = $this->serializer->serialize($newMarker, 'json', ['groups' => 'emplacement']);
+        $serializedMarker = $this->serializer->serialize($newMarker, 'json', ['groups' => 'marker']);
         return new JsonResponse($serializedMarker, 200, [], true);
     }
     #[Route('/api/marker/{id}', name: 'api_marker_update', methods: ['PUT'])]
     public function updateMarker(string $id, Request $request){
         $requestDatas = json_decode($request->getContent(), true);
         $newMarker = $this->markerService->addMarker($requestDatas);
-        return new JsonResponse($newMarker, 200, [], false);
+        $serializedMarker = $this->serializer->serialize($newMarker, 'json', ['groups' => 'marker']);
+        return new JsonResponse($serializedMarker, 200, [], true);
     }
     #[Route('/api/marker/{id}', name: 'api_marker_get', methods: ['GET'])]
     public function getMarker(string $id){
         $marker = $this->markerService->getMarker($id);
-        $serializedMarker = $this->serializer->serialize($marker, 'json', ['groups' => 'emplacement']);
+        $serializedMarker = $this->serializer->serialize($marker, 'json', ['groups' => 'marker']);
         return new JsonResponse($serializedMarker, 200, [], true);
     }
     #[Route('/api/marker', name: 'api_marker_getAllMarkers', methods: ['GET'])]
     public function getAllMarker(){
         $markers = $this->markerService->getAllMarker();
-        $serializedMarker = $this->serializer->serialize($markers, 'json', ['groups' => 'emplacement']);
+        $serializedMarker = $this->serializer->serialize($markers, 'json', ['groups' => 'marker']);
         return new JsonResponse($serializedMarker, 200, [], true);
+    }
+
+    #[Route('/api/marker/{id}', name: 'api_marker_deleteMarker', methods: ['DELETE'])]
+    public function deleteMarker(string $id){
+        $response = $this->markerService->deleteMarker($id);
+        $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'marker']);
+        return new JsonResponse($serializedResponse, 200, [], true);
     }
 }

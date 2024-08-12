@@ -50,3 +50,11 @@ services:
     App\EventListener\ExceptionListener:
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
+
+    App\Repository\ArtisteRepository:
+        arguments:
+            $dm: '@doctrine_mongodb.odm.document_manager'
+        calls:
+            - setLogger: ['@logger']
+
+

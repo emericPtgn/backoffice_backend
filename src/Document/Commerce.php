@@ -25,7 +25,7 @@ class Commerce
     #[Groups(["commerce"])]
     private string $reseauSocial;
 
-    #[MongoDB\EmbedOne(targetDocument: Emplacement::class)]
+    #[MongoDB\ReferenceOne(targetDocument: Emplacement::class)]
     #[Groups(["commerce"])]
     private Emplacement $emplacement;
 

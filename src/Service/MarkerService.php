@@ -3,80 +3,39 @@
 namespace App\Service;
 use App\Document\Emplacement;
 use App\Document\Marker;
+use App\Repository\MarkerRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class MarkerService {
 
     private DocumentManager $dm;
-    public function __construct(DocumentManager $dm){
+    private MarkerRepository $markerRepo;
+
+    public function __construct(DocumentManager $dm, MarkerRepository $markerRepo){
         $this->dm = $dm;
+        $this->markerRepo = $markerRepo;
     }
     public function addMarker(array $requestDatas){
-        $newMarker = new Marker();
-        if(isset($requestDatas['description'])){
-            $newMarker->setDescription($requestDatas['description']);
-        }
-        if(isset($requestDatas['nom'])){
-            $newMarker->setNom($requestDatas['nom']);
-        }
-        if(isset($requestDatas['emplacement'])){
-            if(isset($requestDatas['emplacement']['id'])){
-                $emplacement = $this->dm->getRepository(Emplacement::class)->find($requestDatas['emplacement']['id']);
-                $newMarker->setEmplacement($emplacement);
-            } else {
-                $emplacement = new Emplacement();
-                $emplacement->setNom($requestDatas['emplacement']['nom']);
-                $emplacement->setLatitude($requestDatas['emplacement']['latitude']);
-                $emplacement->setLongitude($requestDatas['emplacement']['longitude']);
-                $this->dm->persist($emplacement);
-                $newMarker->setEmplacement($emplacement);
-            }
-        }
-        if(isset($requestDatas['icone'])){
-            $newMarker->setIcone($requestDatas['icone']);
-        }
-        $this->dm->persist($newMarker);
-        $this->dm->flush();
-        return $newMarker;
+        return $this->markerRepo->addMarker($requestDatas);
     }
+
     public function updateMarker(string $id, array $requestDatas){
-        $markerToUpdate = $this->dm->getRepository(Marker::class)->find($id);
-        if(!$markerToUpdate){
-            return ['message' => 'no marker found with this ID'];
-        } else {
-            if(isset($requestDatas['description'])){
-                $markerToUpdate->setDescription($requestDatas['description']);
-            }
-            if(isset($requestDatas['nom'])){
-                $markerToUpdate->setNom($requestDatas['nom']);
-            }
-            if(isset($requestDatas['emplacement'])){
-                $markerToUpdate->setEmplacement($requestDatas['emplacement']);
-            }
-            if(isset($requestDatas['icone'])){
-                $markerToUpdate->setIcone($requestDatas['icone']);
-            }
-            $this->dm->persist($markerToUpdate);
-            $this->dm->flush();
-            return $markerToUpdate;
-        }
+        return $this->markerRepo->updateMarker($id, $requestDatas);
     }
 
     public function getMarker(string $id){
-        $marker = $this->dm->getRepository(Marker::class)->find($id);
-        if(!$marker){
-            return ['message' => 'no marker found with this ID'];
-        } else {
-            return $marker;
-        }
+        return $this->markerRepo->getMarker($id);
     }
 
     public function getAllMarker(){
-        $allMarkers = $this->dm->getRepository(Marker::class)->findAll();
-        if(!$allMarkers){
-            return ['message' => 'no markers found, create a new one!'];
-        } else {
-            return $allMarkers;
-        }
+        return $this->markerRepo->getAllMarker();
+    }
+
+    public function addScene(array $requestDatas){
+        return $this->markerRepo->addScene($requestDatas);
+    }
+
+    public function deleteMarker(string $id){
+        return $this->markerRepo->deleteMarker($id);
     }
 }

@@ -32,7 +32,7 @@ class ActiviteAPIController extends AbstractController {
             return new JsonResponse(['erreor' => 'invalid Json'], Response::HTTP_BAD_REQUEST);
         }
         $activity = $this->activiteService->addActivity($requestDatas);
-        $serializedActivity = $this->serializer->serialize($activity, 'json');
+        $serializedActivity = $this->serializer->serialize($activity, 'json', ['groups' => 'activite']);
         return new JsonResponse($serializedActivity, 200, [], true);
     }
 

@@ -21,6 +21,10 @@ class Scene
     #[Groups(['scene', 'emplacement'])]
     private Emplacement $emplacement;
 
+    #[MongoDB\EmbedOne(targetDocument: Marker::class)]
+    #[Groups(['scene', 'marker'])]
+    private Marker $marker;
+
     // Getter and Setter methods
 
     public function getId(): string
@@ -53,6 +57,17 @@ class Scene
     public function setEmplacement(Emplacement $emplacement): self
     {
         $this->emplacement = $emplacement;
+        return $this;
+    }
+
+    public function getMarker(): Marker
+    {
+        return $this->marker;
+    }
+
+    public function setMarker(Marker $marker): self
+    {
+        $this->marker = $marker;
         return $this;
     }
 }

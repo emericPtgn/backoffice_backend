@@ -3,32 +3,43 @@
 namespace App\Document;
 
 use App\Repository\MarkerRepository;
+use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[MongoDB\Document(repositoryClass: MarkerRepository::class, collection: 'marker')]
+
 class Marker
 {
-
     #[MongoDB\Id]
-    #[Groups(['emplacement'])]
+    #[Groups(['marker'])]
     private string $id;
 
     #[MongoDB\Field(type: "string")]
-    #[Groups(['emplacement'])]
-    private string $nom;
+    #[Groups(['marker', 'artiste'])]
+    #[Assert\Unique]
+    private ?string $nom = null;
 
     #[MongoDB\Field(type: "string")]
-    #[Groups(['emplacement'])]
-    private string $description;
+    #[Groups(['marker'])]
+    private ?string $description = null;
 
     #[MongoDB\Field(type: "string")]
-    #[Groups(['emplacement'])]
-    private string $icone;
+    #[Groups(['marker'])]
+    private ?string $icone = null;
 
-    #[MongoDB\EmbedOne(targetDocument: Emplacement::class)]
-    #[Groups(['emplacement'])]
-    private Emplacement $emplacement;
+    #[MongoDB\Field(type: "string")]
+    #[Groups(['marker'])]
+    private ?string $type = null;
+
+    #[MongoDB\Field(type: "float")]
+    #[Groups(["marker"])]
+    private ?float $latitude = null;
+
+    #[MongoDB\Field(type: "float")]
+    #[Groups(["marker"])]
+    private ?float $longitude = null;
 
     // Getters and setters...
 
@@ -76,14 +87,36 @@ class Marker
         return $this;
     }
 
-    public function getEmplacement(): Emplacement
+    public function getType(): string
     {
-        return $this->emplacement;
+        return $this->type;
     }
 
-    public function setEmplacement(Emplacement $emplacement): self
+    public function setType(string $type): self
     {
-        $this->emplacement = $emplacement;
+        $this->type = $type;
+        return $this;
+    }
+
+    public function getLatitude(): float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(float $latitude): self
+    {
+        $this->latitude = $latitude;
+        return $this;
+    }
+
+    public function getLongitude(): float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(float $longitude): self
+    {
+        $this->longitude = $longitude;
         return $this;
     }
 }
