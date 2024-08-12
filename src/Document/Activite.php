@@ -39,10 +39,19 @@ class Activite
     #[Groups(["activite", "artiste"])]
     private ?Marker $marker = null;
 
-    #[MongoDB\ReferenceMany(targetDocument: Artiste::class, cascade: 'persist')]
+    #[MongoDB\ReferenceMany(targetDocument: Artiste::class, cascade: ['persist'])]
     #[Groups(["activite"])]
     #[MaxDepth(1)]
     private ?Collection $artistes = null;
+
+    #[MongoDB\Field(type: "string")]
+    #[Groups(["activite", "artiste"])]
+    private ?string $artistesNames = null;
+
+    #[MongoDB\Field(type: "string")]
+    #[Groups(["activite", "artiste"])]
+    private ?string $artistesIds = null;
+
 
     public function __construct()
     {
@@ -125,6 +134,8 @@ class Activite
     {
         if (!$this->artistes->contains($artiste)) {
             $this->artistes->add($artiste);
+            $this->updateArtistesNames();
+            $this->updateArtistesIds();
         }
         return $this;
     }
@@ -132,7 +143,9 @@ class Activite
     public function removeArtiste(Artiste $artiste): self
     {
         if ($this->artistes->removeElement($artiste)) {
-            $artiste->removeActivite($this); // Mise à jour bidirectionnelle
+            $artiste->removeActivite($this); 
+            $this->updateArtistesNames();
+            $this->updateArtistesIds();
         }
         return $this;
     }
@@ -147,4 +160,38 @@ class Activite
         $this->description = $description;
         return $this;
     }
+
+    public function getArtistesNames(): ?string
+    {
+        return $this->artistes->isEmpty() ? '' : implode(', ', $this->artistes->map(function(Artiste $artiste) {
+            return $artiste->getNom();
+        })->toArray());
+    }
+    
+
+    private function updateArtistesNames(): void
+    {
+        $this->artistesNames = $this->getArtistesNames();
+    }
+    
+
+    public function getArtistesIds(): ?string
+    {
+        if($this->artistesIds === null){
+            $this->artistesIds = $this->artistes->map(function(Artiste $artiste){
+                return $artiste->getId();
+            })->toArray() ? implode(', ', $this->artistes->map(function(Artiste $artiste){
+                return $artiste->getId();
+            })->toArray()) : '';
+        }
+        return $this->artistesIds;
+    }
+
+    private function updateArtistesIds(): void
+    {
+        $this->artistesIds = $this->getArtistesIds();
+    }
+
+
+
 }

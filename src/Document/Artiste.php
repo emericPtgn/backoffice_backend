@@ -34,7 +34,7 @@ class Artiste
     #[Groups(["artiste"])]
     protected ?Collection $reseauxSociaux;
 
-    #[MongoDB\ReferenceMany(targetDocument: Activite::class, cascade:'persist')]
+    #[MongoDB\ReferenceMany(targetDocument: Activite::class, cascade: ['persist'])]
     #[Groups(["artiste"])]
     #[MaxDepth(1)]
     private ?Collection $activities = null;

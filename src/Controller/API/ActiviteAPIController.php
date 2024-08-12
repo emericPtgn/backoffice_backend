@@ -58,7 +58,7 @@ class ActiviteAPIController extends AbstractController {
     public function getActivities() : JsonResponse
     {
         $activities = $this->activiteService->getActivities();
-        $serializedActivity = $this->serializer->serialize($activities, 'json', ['groups' => 'activite']);
+        $serializedActivity = $this->serializer->serialize($activities, 'json', ['groups' => 'activite', 'artiste']);
         return new JsonResponse($serializedActivity, 200, [], true);
     }
 
@@ -66,7 +66,7 @@ class ActiviteAPIController extends AbstractController {
     public function getActivity(string $id): JsonResponse
     {
         $activity = $this->activiteService->getActivity($id);
-        $serializedActivity = $this->serializer->serialize($activity, 'json', ['groups' => 'activite']);
+        $serializedActivity = $this->serializer->serialize($activity, 'json', ['groups' => 'activite', 'artiste']);
         return new JsonResponse($serializedActivity, 200, [], true);
     }
 
