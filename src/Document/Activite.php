@@ -177,15 +177,11 @@ class Activite
 
     public function getArtistesIds(): ?string
     {
-        if($this->artistesIds === null){
-            $this->artistesIds = $this->artistes->map(function(Artiste $artiste){
-                return $artiste->getId();
-            })->toArray() ? implode(', ', $this->artistes->map(function(Artiste $artiste){
-                return $artiste->getId();
-            })->toArray()) : '';
-        }
-        return $this->artistesIds;
+        return $this->artistes->isEmpty() ? '' : implode(', ', $this->artistes->map(function(Artiste $artiste) {
+            return $artiste->getId();
+        })->toArray());
     }
+    
 
     private function updateArtistesIds(): void
     {

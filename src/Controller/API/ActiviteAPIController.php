@@ -40,7 +40,8 @@ class ActiviteAPIController extends AbstractController {
     public function deleteActivity(string $id) : JsonResponse
     {
         $response = $this->activiteService->deleteActivity($id);
-        return new JsonResponse($response, 200, [], false);
+        $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'activite']);
+        return new JsonResponse($serializedResponse, 200, [], true);
     }
 
     // gère la mise à jour d'une activity

@@ -2,70 +2,36 @@
 
 namespace App\Service;
 use App\Document\TypeCommerce;
+use App\Repository\TypeCommerceRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class TypeCommerceService {
     private DocumentManager $dm;
-    public function __construct(DocumentManager $dm){
+    private TypeCommerceRepository $typeCommerceRepo;
+
+    public function __construct(DocumentManager $dm, TypeCommerceRepository $typeCommerceRepo){
         $this->dm = $dm;
+        $this->typeCommerceRepo = $typeCommerceRepo;
     }   
+
     public function addNewType(array $requestDatas){
-        $newTypeCommerce = new TypeCommerce();
-        if(isset($requestDatas['icone'])){
-            $newTypeCommerce->setIcone($requestDatas['icone']);
-        }
-        if(isset($requestDatas['nom'])){
-            $newTypeCommerce->setNom($requestDatas['nom']);
-        }
-        $this->dm->persist($newTypeCommerce);
-        $this->dm->flush();
-        return $newTypeCommerce;
+        return $this->typeCommerceRepo->addNewType($requestDatas);
     }
 
     public function updateTypeCommerce(string $id, array $requestDatas){
-        $commerceToUpdate = $this->dm->getRepository(TypeCommerce::class)->find($id);
-        if(!$commerceToUpdate){
-            return ['message' => 'no commerce found with this ID']; 
-        } else {
-            if(isset($requestDatas['icone'])){
-                $commerceToUpdate->setIcone($requestDatas['icone']);
-            }
-            if(isset($requestDatas['nom'])){
-                $commerceToUpdate->setNom($requestDatas['nom']);
-            }
-            $this->dm->persist($commerceToUpdate);
-            $this->dm->flush();
-            return $commerceToUpdate;
-        }
+        return $this->typeCommerceRepo->updateTypeCommerce($id, $requestDatas);
     }
 
     public function getTypeCommerce(string $id){
-        $typeCommerce = $this->dm->getRepository(TypeCommerce::class)->find($id);
-        if(!$typeCommerce){
-            return ['message' => 'no commerce found with this ID'];
-        } else {
-            return $typeCommerce;
-        }
+        return $this->typeCommerceRepo->getTypeCommerce($id);
     }
 
     public function getAllTypesCommerces(){
-        $allTypesCommerces = $this->dm->getRepository(TypeCommerce::class)->findAll();
-        if(!$allTypesCommerces){
-            return ['message' => 'no commerce found with this ID'];
-        } else {
-            return $allTypesCommerces;
-        }
+        return $this->typeCommerceRepo->getAllTypesCommerces();
     }
 
     public function removeTypeCommerce(string $id){
-        $typeCommerceToRemove = $this->dm->getRepository(TypeCommerce::class)->find($id);
-        if(!$typeCommerceToRemove){
-            return ['message' => 'no commerce found with this ID'];
-        } else {
-            $this->dm->remove($typeCommerceToRemove);
-            $this->dm->flush();
-            return ['message' => 'commerce has been removed successfully'];
-        }
+        return $this->typeCommerceRepo->removeTypeCommerce($id);
     }
 
 }

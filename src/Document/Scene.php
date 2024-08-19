@@ -25,6 +25,10 @@ class Scene
     #[Groups(['scene', 'marker'])]
     private Marker $marker;
 
+    #[MongoDB\Field(type: 'collection')]
+    #[Groups(['scene'])]
+    private ?array $photos;
+
     // Getter and Setter methods
 
     public function getId(): string
@@ -70,4 +74,17 @@ class Scene
         $this->marker = $marker;
         return $this;
     }
+
+    public function getPhotos() : ? array
+    {
+        return $this->photos;
+    }
+
+    public function setPhotos(?array $photos = null) : self
+    {
+        $this->photos = $photos;
+        return $this;
+    }
+
+
 }

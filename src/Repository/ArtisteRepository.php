@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Document\Marker;
 use App\Document\Artiste;
 use App\Document\Activite;
+use Error;
 use Psr\Log\LoggerInterface;
 use App\Document\ReseauSocial;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -207,20 +208,38 @@ class ArtisteRepository extends DocumentRepository
     public function removeArtiste(string $id)
     {
         $artiste = $this->dm->getRepository(Artiste::class)->find($id);
+    
         if (!$artiste) {
-            return ['message' => 'no artiste found'];
-        } else {
+            return [
+                'message' => 'Artist not found',
+                'statut' => 'error'
+            ];
+        }
+    
+        try {
             $this->dm->remove($artiste);
             $this->dm->flush();
-            return ['message' => 'artiste removed successfully'];
+    
+            return [
+                'message' => 'Artist removed successfully',
+                'statut' => 'success'
+            ];
+        } catch (\Exception $exception) {
+            return [
+                'message' => 'An error occurred: ' . $exception->getMessage(),
+                'statut' => 'error'
+            ];
         }
     }
+    
 
     public function getArtistes()
     {
         $artistes = $this->dm->getRepository(Artiste::class)->findAll();
         if (!$artistes) {
-            return ['message' => 'no artiste found'];
+            return [
+                'message' => 'no artiste found'
+            ];
         } else {
             return $artistes;
         }

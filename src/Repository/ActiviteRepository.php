@@ -225,16 +225,34 @@ public function updateActivity(string $id, array $requestDatas)
     }
 }
 
-public function deleteActivity(string $id){
+public function deleteActivity(string $id)
+{
     $activity = $this->dm->getRepository(Activite::class)->find($id);
-    if(!$activity){
-        return ['mesage' => 'no activity found'];
-    } else {
+    
+    if (!$activity) {
+        return [
+            'message' => 'No activity found',
+            'statut' => 'error'
+        ];
+    }
+
+    try {
         $this->dm->remove($activity);
         $this->dm->flush();
-        return ['message' => 'activity removed successfully'];
+
+        return [
+            'message' => 'Activity removed successfully',
+            'statut' => 'success'
+        ];
+    } catch (\Exception $exception) {
+        // Here, you can either log the error, re-throw it, or return a structured error message
+        return [
+            'message' => 'An error occurred: ' . $exception->getMessage(),
+            'statut' => 'error'
+        ];
     }
 }
+
 
 
     

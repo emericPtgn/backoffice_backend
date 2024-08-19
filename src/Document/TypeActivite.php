@@ -10,7 +10,7 @@ class TypeActivite
 {
     #[MongoDB\Id]
     #[Groups(["activite"])]
-    private string $id;
+    private ?string $id = null;
 
     #[MongoDB\Field(type: "string")]
     #[Groups(["activite"])]

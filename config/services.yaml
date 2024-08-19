@@ -7,6 +7,7 @@ parameters:
     env(MONGODB_URL): ''
     env(MONGODB_DB): ''
 
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -56,5 +57,16 @@ services:
             $dm: '@doctrine_mongodb.odm.document_manager'
         calls:
             - setLogger: ['@logger']
+
+
+    App\Repository\CommerceRepository:
+        arguments:
+            $dm: '@doctrine_mongodb.odm.document_manager'
+        calls:
+            - setLogger: ['@logger']
+
+    App\EventSubscriber\MarkerSubscriber:
+        tags:
+            - { name: doctrine_mongodb.odm.event_subscriber }
 
 

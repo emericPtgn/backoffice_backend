@@ -9,15 +9,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[MongoDB\Document(repositoryClass: MarkerRepository::class, collection: 'marker')]
-
 class Marker
 {
     #[MongoDB\Id]
-    #[Groups(['marker'])]
+    #[Groups(['marker', "commerce"])]
     private string $id;
 
     #[MongoDB\Field(type: "string")]
-    #[Groups(['marker', 'artiste'])]
+    #[Groups(['marker', 'artiste', 'commerce'])]
     #[Assert\Unique]
     private ?string $nom = null;
 
@@ -26,20 +25,29 @@ class Marker
     private ?string $description = null;
 
     #[MongoDB\Field(type: "string")]
-    #[Groups(['marker'])]
+    #[Groups(['marker', 'commerce'])]
     private ?string $icone = null;
 
     #[MongoDB\Field(type: "string")]
-    #[Groups(['marker'])]
+    #[Groups(['marker', 'commerce'])]
     private ?string $type = null;
 
     #[MongoDB\Field(type: "float")]
-    #[Groups(["marker"])]
+    #[Groups(["marker", "commerce"])]
     private ?float $latitude = null;
 
     #[MongoDB\Field(type: "float")]
-    #[Groups(["marker"])]
+    #[Groups(["marker", "commerce"])]
     private ?float $longitude = null;
+
+    // Constructor with optional parameters
+    public function __construct(?float $lat = null, ?float $lng = null, ?string $nom = null, ?string $type = null)
+    {
+        $this->latitude = $lat;
+        $this->longitude = $lng;
+        $this->nom = $nom;
+        $this->type = $type;
+    }
 
     // Getters and setters...
 
@@ -59,7 +67,7 @@ class Marker
         return $this->nom;
     }
 
-    public function setNom(string $nom): self
+    public function setNom(?string $nom = null): self
     {
         $this->nom = $nom;
         return $this;
@@ -70,7 +78,7 @@ class Marker
         return $this->description;
     }
 
-    public function setDescription(string $description): self
+    public function setDescription(?string $description = null): self
     {
         $this->description = $description;
         return $this;
@@ -81,7 +89,7 @@ class Marker
         return $this->icone;
     }
 
-    public function setIcone(string $icone): self
+    public function setIcone(?string $icone = null): self
     {
         $this->icone = $icone;
         return $this;
@@ -92,7 +100,7 @@ class Marker
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(?string $type = null): self
     {
         $this->type = $type;
         return $this;
@@ -103,7 +111,7 @@ class Marker
         return $this->latitude;
     }
 
-    public function setLatitude(float $latitude): self
+    public function setLatitude(?float $latitude = null): self
     {
         $this->latitude = $latitude;
         return $this;
@@ -114,7 +122,7 @@ class Marker
         return $this->longitude;
     }
 
-    public function setLongitude(float $longitude): self
+    public function setLongitude(?float $longitude = null): self
     {
         $this->longitude = $longitude;
         return $this;

@@ -24,10 +24,8 @@ class MarkerRepository extends DocumentRepository {
         if(isset($requestDatas['icone'])){
             $newMarker->setIcone($requestDatas['icone']);
         }
-        if(isset($requestDatas['latitude'])){
+        if(isset($requestDatas['latitude']) && isset($requestDatas['longitude'])){
             $newMarker->setLatitude($requestDatas['latitude']);
-        }
-        if(isset($requestDatas['longitude'])){
             $newMarker->setLongitude($requestDatas['longitude']);
         }
         if(isset($requestDatas['type'])){
@@ -52,13 +50,10 @@ class MarkerRepository extends DocumentRepository {
             if(isset($requestDatas['icone'])){
                 $markerToUpdate->setIcone($requestDatas['icone']);
             }
-            if(isset($requestDatas['latitude'])){
+            if(isset($requestDatas['latitude']) && isset($requestDatas['longitude'])){
                 $markerToUpdate->setLatitude($requestDatas['latitude']);
-            }
-            if(isset($requestDatas['longitude'])){
                 $markerToUpdate->setLongitude($requestDatas['longitude']);
             }
-
             if(isset($requestDatas['type'])){
                 $markerToUpdate->setType($requestDatas['type']);
             }
@@ -86,16 +81,38 @@ class MarkerRepository extends DocumentRepository {
         }
     }
 
-    public function deleteMarker($id){
+    public function deleteMarker(string $id)
+    {
+        // Recherchez le marqueur par ID
         $markerToDelete = $this->find($id);
-        if(!$markerToDelete){
-            return ['message' => 'no markers found'];
-        } else {
+    
+        if (!$markerToDelete) {
+            // Retournez un message indiquant que le marqueur n'a pas été trouvé
+            return [
+                'message' => 'Marker not found',
+                'statut' => 'not found'
+            ];
+        }
+    
+        try {
+            // Supprimez le marqueur de la base de données
             $this->dm->remove($markerToDelete);
             $this->dm->flush();
-            return 'deleted';
+    
+            // Retournez un message de succès
+            return [
+                'message' => 'Marker successfully deleted',
+                'statut' => 'success'
+            ];
+        } catch (\Exception $e) {
+            // Gérez les exceptions potentielles
+            return [
+                'message' => 'An error occurred: ' . $e->getMessage(),
+                'statut' => 'error'
+            ];
         }
     }
+    
 
     public function addScene(array $requestDatas){
         $newScene = new Marker();
