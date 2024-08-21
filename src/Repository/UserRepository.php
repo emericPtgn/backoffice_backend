@@ -62,7 +62,10 @@ class UserRepository extends ServiceDocumentRepository implements PasswordUpgrad
         try {
             $this->dm->remove($user);
             $this->dm->flush();
-            return ['message' => 'User removed successfully'];
+            return [
+                'message' => 'User removed successfully',
+                'status' => 'success'
+            ];
         } catch (\Throwable $th) {
             return ['error' => 'An error has occured, user not been removed'];
         } 
@@ -105,6 +108,37 @@ class UserRepository extends ServiceDocumentRepository implements PasswordUpgrad
             return ['message' => 'no users found, add your first user!'];
         }
         return $users;
+    }
+
+    public function getThisUser(string $id){
+        $user = $this->find($id);
+        if(!$user){
+            return [
+                'message' => 'no users found',
+                'status' => 'not found'
+            ];
+        }
+        return $user;
+    }
+
+    public function resetPassword(array $requestDatas, string $token, PasswordAuthenticatedUserInterface $user){
+        $findUser = $this->findOneBy(['verificationToken' => $token]);
+        if(!$findUser){
+            return [
+                'message' => 'erreur : token invalide',
+                'status' => 'success'
+            ];
+        } else {
+            if(isset($requestDatas['newValue'])){
+                $plainTextPassword = $requestDatas[0];
+                $hashedPassword = $this->passwordHasher->hashPassword($user, $plainTextPassword);
+                $findUser->setPassword($hashedPassword);
+            }
+            return [
+                'message' => 'success : mot de passe changé avec succés',
+                'status' => 'success'
+            ];
+        }
     }
 
 }

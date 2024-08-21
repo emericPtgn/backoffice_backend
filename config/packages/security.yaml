@@ -29,22 +29,32 @@ security:
         api:
             pattern: ^/api
             stateless: true
+            entry_point: jwt
+            # json_login:
+            #     check_path: /api/login_check # or, if you have defined a route for your login path, the route name you used
+            #     success_handler: lexik_jwt_authentication.handler.authentication_success
+            #     failure_handler: lexik_jwt_authentication.handler.authentication_failure
             jwt: ~
+            refresh_jwt:
+                check_path: /api/token/refresh # or, you may use the `api_refresh_token` route name
+                # or if you have more than one user provider
+                # provider: user_provider_name
+
+
 
         main:
             lazy: true
             provider: my_mongo_provider
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                enable_csrf: true
-                username_parameter: _username
-                password_parameter: _password
+            # form_login:
+            #     login_path: app_login
+            #     check_path: app_login
+            #     enable_csrf: true
+            #     username_parameter: _username
+            #     password_parameter: _password
             logout:
                 path: app_logout
                 # where to redirect after logout
                 # target: app_any_route
-            login_throttling: true
             custom_authenticator: 
                 App\Security\CustomAuthenticator
 
@@ -52,7 +62,8 @@ security:
     # Note: Only the *first* access control that matches will be used
 
     access_control:
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/(login|token/refresh), roles: PUBLIC_ACCESS }
+        # - { path: ^/api/login, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
