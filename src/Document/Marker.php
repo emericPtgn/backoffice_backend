@@ -3,20 +3,19 @@
 namespace App\Document;
 
 use App\Repository\MarkerRepository;
-use Doctrine\Bundle\MongoDBBundle\Validator\Constraints\Unique;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[MongoDB\Document(repositoryClass: MarkerRepository::class, collection: 'marker')]
-class Marker
+class Marker extends Commerce 
 {
     #[MongoDB\Id]
-    #[Groups(['marker', "commerce"])]
+    #[Groups(['marker', "commerce", "activite"])]
     private string $id;
 
     #[MongoDB\Field(type: "string")]
-    #[Groups(['marker', 'artiste', 'commerce'])]
+    #[Groups(['marker', 'artiste', 'commerce', 'activite'])]
     #[Assert\Unique]
     private ?string $nom = null;
 
@@ -40,6 +39,14 @@ class Marker
     #[Groups(["marker", "commerce"])]
     private ?float $longitude = null;
 
+    #[MongoDB\Field(type: 'string')]
+    #[Groups(["marker", "commerce"])]
+    private ?string $groupe = null;
+
+    #[MongoDB\Field(type: 'string')]
+    #[Groups(["marker", "commerce"])]
+    private ?string $sousGroupe = null;
+
     // Constructor with optional parameters
     public function __construct(?float $lat = null, ?float $lng = null, ?string $nom = null, ?string $type = null)
     {
@@ -62,7 +69,7 @@ class Marker
         return $this;
     }
 
-    public function getNom(): string
+    public function getNom(): ?string
     {
         return $this->nom;
     }
@@ -73,7 +80,7 @@ class Marker
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -84,7 +91,7 @@ class Marker
         return $this;
     }
 
-    public function getIcone(): string
+    public function getIcone(): ?string
     {
         return $this->icone;
     }
@@ -95,7 +102,7 @@ class Marker
         return $this;
     }
 
-    public function getType(): string
+    public function getType(): ?string
     {
         return $this->type;
     }
@@ -106,7 +113,7 @@ class Marker
         return $this;
     }
 
-    public function getLatitude(): float
+    public function getLatitude(): ?float
     {
         return $this->latitude;
     }
@@ -117,7 +124,7 @@ class Marker
         return $this;
     }
 
-    public function getLongitude(): float
+    public function getLongitude(): ?float
     {
         return $this->longitude;
     }
@@ -125,6 +132,28 @@ class Marker
     public function setLongitude(?float $longitude = null): self
     {
         $this->longitude = $longitude;
+        return $this;
+    }
+
+    public function getGroupe(): ?string
+    {
+        return $this->groupe;
+    }
+
+    public function setGroupe(?string $groupe): self
+    {
+        $this->groupe = $groupe;
+        return $this;
+    }
+
+    public function getSousGroupe(): ?string
+    {
+        return $this->sousGroupe;
+    }
+
+    public function setSousGroupe(?string $sousGroupe): self
+    {
+        $this->sousGroupe = $sousGroupe;
         return $this;
     }
 }

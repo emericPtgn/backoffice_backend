@@ -33,14 +33,14 @@ class EmplacementAPIController extends AbstractController{
         return new JsonResponse($updatedEmplacement, 200, [], false);
     }
 
-    #[Route('/api/emplacement/{id}', name: 'api_emplacement_get', methods: ['GET'])]
+    #[Route('/public/api/emplacement/{id}', name: 'api_emplacement_get', methods: ['GET'])]
     public function getEmplacement(string $id){
         $emplacement = $this->emplacementService->getEmplacement($id);
         $serializedEmplacement = $this->serializer->serialize($emplacement, 'json', ['groups' => 'emplacement']);
         return new JsonResponse($serializedEmplacement, 200, [], true);
     }
 
-    #[Route('/api/emplacement', name: 'api_emplacement_getAll', methods: ['GET'])]
+    #[Route('/public/api/emplacement', name: 'api_emplacement_getAll', methods: ['GET'])]
     public function getAllEmplacements(){
         $allEmplacements = $this->emplacementService->getAllEmplacements();
         $serializedEmplacement = $this->serializer->serialize($allEmplacements, 'json', ['groups' => 'emplacement']);

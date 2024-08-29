@@ -34,7 +34,8 @@ class ArtisteAPIController extends AbstractController {
     #[Route('/api/artiste/{id}', name: 'app_artiste_remove', methods:['DELETE'])]
     public function removeArtiste(string $id) : JsonResponse {
         $response = $this->artisteService->removeArtiste($id);
-        return new JsonResponse($response, 200, [], false);
+        $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'artiste']);
+        return new JsonResponse($serializedResponse, 200, [], true);
     }
 
     #[Route('/api/artiste/{id}', name: 'app_artiste_update', methods:['PUT'])]
@@ -45,14 +46,14 @@ class ArtisteAPIController extends AbstractController {
         return new JsonResponse($serializedResponse, 200, [], true);
     }
 
-    #[Route('/api/artiste/{id}', name: 'app_artiste_get', methods:['GET'])]
+    #[Route('/public/api/artiste/{id}', name: 'app_artiste_get', methods:['GET'])]
     public function getArtiste(string $id) : JsonResponse {
         $response = $this->artisteService->getArtiste($id);
         $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'artiste']);
         return new JsonResponse($serializedResponse, 200, [], true);
     }
 
-    #[Route('/api/artiste', name: 'app_artiste_get_liste', methods:['GET'])]
+    #[Route('/public/api/artiste', name: 'app_artiste_get_liste', methods:['GET'])]
     public function getListeArtistes() : JsonResponse {
         $response = $this->artisteService->getArtistes();
         $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'artiste']);

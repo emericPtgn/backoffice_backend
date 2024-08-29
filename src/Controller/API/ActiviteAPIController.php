@@ -55,7 +55,7 @@ class ActiviteAPIController extends AbstractController {
         return new JsonResponse($serializeResponse, 200, [], true);
     }
 
-    #[Route('/api/activity', name: 'api_activity_get_activities', methods: ['GET'])]
+    #[Route('/public/api/activity', name: 'api_activity_get_activities', methods: ['GET'])]
     public function getActivities() : JsonResponse
     {
         $activities = $this->activiteService->getActivities();
@@ -63,7 +63,7 @@ class ActiviteAPIController extends AbstractController {
         return new JsonResponse($serializedActivity, 200, [], true);
     }
 
-    #[Route('/api/activity/{id}', name: 'api_activity_get_activity', methods:['GET'])]
+    #[Route('/public/api/activity/{id}', name: 'api_activity_get_activity', methods:['GET'])]
     public function getActivity(string $id): JsonResponse
     {
         $activity = $this->activiteService->getActivity($id);

@@ -24,7 +24,7 @@ class Artiste
 
     #[MongoDB\Field(type: 'collection', name: 'style')]
     #[Groups(["artiste"])]
-    protected ?array $styles = null; // Changed type to array
+    protected ?array $styles = [];
 
     #[MongoDB\Field(type: 'string', name: 'description')]
     #[Groups(["artiste"])]
@@ -37,18 +37,12 @@ class Artiste
     #[MongoDB\ReferenceMany(targetDocument: Activite::class, cascade: ['persist'])]
     #[Groups(["artiste"])]
     #[MaxDepth(1)]
-    private ?Collection $activities = null;
+    private ?Collection $activities;
 
     public function __construct()
     {
-        $this->styles = []; // Changed to empty array
         $this->reseauxSociaux = new ArrayCollection();
         $this->activities = new ArrayCollection();
-    }
-
-    public function __toString(): string
-    {
-        return $this->nom;
     }
 
     public function getId(): ?string
@@ -124,7 +118,7 @@ class Artiste
     public function removeActivite(Activite $activite): self
     {
         if ($this->activities->removeElement($activite)) {
-            $activite->removeArtiste($this); // Mise à jour bidirectionnelle
+            $activite->removeArtiste($this); // Update bidirectionnelle
         }
         return $this;
     }

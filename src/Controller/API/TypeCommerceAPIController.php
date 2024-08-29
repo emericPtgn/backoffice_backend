@@ -34,14 +34,14 @@ class TypeCommerceAPIController extends AbstractController{
         return new JsonResponse($serializedTypeCommerce, 200, [], true);
     }
 
-    #[Route('/api/type_commerce/{id}', name: 'api_typeCommerce_get', methods: ['GET'])]
+    #[Route('/public/api/type_commerce/{id}', name: 'api_typeCommerce_get', methods: ['GET'])]
     public function getTypeCommerce(string $id) : JsonResponse {
         $typeCommerce = $this->typeCommerceService->getTypeCommerce($id);
         $serializedTypeCommerce = $this->serializer->serialize($typeCommerce, 'json', ['groups' => 'commerce']);
         return new JsonResponse($serializedTypeCommerce, 200, [], true);
     }
 
-    #[Route('/api/type_commerce', name: 'api_typeCommerce_getAll', methods: ['GET'])]
+    #[Route('/public/api/type_commerce', name: 'api_typeCommerce_getAll', methods: ['GET'])]
     public function getAllTypesCommerces() : JsonResponse {
         $allTypesCommerces = $this->typeCommerceService->getAllTypesCommerces();
         $serializedTypesCommerces = $this->serializer->serialize($allTypesCommerces, 'json', ['groups' => 'commerce']);

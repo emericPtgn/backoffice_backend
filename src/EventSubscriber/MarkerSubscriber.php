@@ -1,13 +1,16 @@
 <?php
 
-namespace App\EventListener;
+namespace App\EventSubscriber;
+
+use App\Document\Marker;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use Doctrine\ODM\MongoDB\Events;
 use Doctrine\Common\EventSubscriber;
 use App\Document\Commerce;
 
 class MarkerSubscriber implements EventSubscriber {
-    public function getSubscribedEvents(){
+    public function getSubscribedEvents(): array
+    {
         return [
             Events::preRemove,
         ];

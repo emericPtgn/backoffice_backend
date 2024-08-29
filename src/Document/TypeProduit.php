@@ -14,7 +14,7 @@ class TypeProduit
     private ?string $id = null;
 
     #[MongoDB\Field(type: "string")]
-    #[Groups(["commerce"])]
+    #[Groups(["commerce", "marker"])]
     #[Assert\Unique]
     private ?string $nom = null;
 

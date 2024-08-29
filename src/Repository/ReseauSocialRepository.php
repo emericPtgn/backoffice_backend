@@ -13,13 +13,6 @@ class ReseauSocialRepository extends DocumentRepository {
         parent::__construct($dm, $uow, $classMetaData);
     }
 
-    public function deleteSocial(string $id){
-        $social = $this->find($id);
-        if(!$social){
-            return ['message' => "no social found"];
-        } else {
-            $this->dm->remove($social);
-        }
-    }
+
     
 }

@@ -45,12 +45,12 @@ api_activity_delete_activity:
     methods: ['DELETE']
 
 api_activity_get_activity:
-    path: /api/activity/{id}
+    path: /public/api/activity/{id}
     controller: App\Controller\API\ActiviteAPIController::getActivity
     methods: ['GET']
 
 api_activity_get_activities:
-    path: /api/activity
+    path: /public/api/activity
     controller: App\Controller\API\ActiviteAPIController::getActivities
     methods: ['GET']
 
@@ -68,12 +68,12 @@ api_programmation_delete:
     methods: ['DELETE']
 
 api_programmation_get:
-    path: /api/programmation/{id}
+    path: /public/api/programmation/{id}
     controller: App\Controller\API\ProgrammationAPIController::getProgrammation
     methods: ['GET']
 
 api_programmation_get_liste:
-    path: /api/programmation
+    path: /public/api/programmation
     controller: App\Controller\API\ProgrammationAPIController::getAllProgrammations
     methods: ['GET']
 
@@ -109,7 +109,7 @@ api_user_update_user:
 api_user_get_users:
     path: /api/user
     controller: App\Controller\API\UserAPIController::getUsers
-    methods: ['GET']
+    methods: ['GET', 'OPTIONS']
 
 
 

@@ -68,5 +68,17 @@ services:
     App\EventSubscriber\MarkerSubscriber:
         tags:
             - { name: doctrine_mongodb.odm.event_subscriber }
+    
+    App\EventSubscriber\ArtisteSubscriber:
+        tags:
+            - { name: doctrine_mongodb.odm.event_subscriber }
+
+    App\EventSubscriber\ActiviteSubscriber:
+        tags:
+            - { name: doctrine_mongodb.odm.event_subscriber }
+
+    App\EventListener\CorsListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
 

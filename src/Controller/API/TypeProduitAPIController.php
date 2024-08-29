@@ -33,14 +33,14 @@ class TypeProduitAPIController extends AbstractController {
         return new JsonResponse($newTypeProduit, 200, [], false);
     }
 
-    #[Route('/api/type_produit/{id}', name: 'api_typeProduit_get', methods: ['GET'])]
+    #[Route('/public/api/type_produit/{id}', name: 'api_typeProduit_get', methods: ['GET'])]
     public function getTypeProduct(string $id) : JsonResponse {
         $typeProduit = $this->typeProduitService->getTypeProduct($id);
         $serializedTypeProduit = $this->serializer->serialize($typeProduit, 'json');
         return new JsonResponse($serializedTypeProduit, 200, [], true);
     }
 
-    #[Route('/api/type_produit', name: 'api_typeProduit_getAll', methods: ['GET'])]
+    #[Route('/public/api/type_produit', name: 'api_typeProduit_getAll', methods: ['GET'])]
     public function getAllTypesProducts() : JsonResponse {
         $allTypesProducts = $this->typeProduitService->getAllTypesProducts();
         $serializedTypeProduit = $this->serializer->serialize($allTypesProducts, 'json');

@@ -28,6 +28,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     #[MongoDB\Field(type: 'string')]
+    #[Assert\Unique(fields: ['email'], message: 'new mail should be unique.')]
+    #[Groups(['user'])]
+    private ?string $newEmail = null;
+
+    #[MongoDB\Field(type: 'string')]
     #[Assert\NotBlank]
     private ?string $password = null;
 
@@ -61,6 +66,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[MongoDB\Field(type: 'date')]
     private ?DateTime $verificationTokenExpiresAt = null;
 
+
     public function __construct()
     {
         $this->dateCreation = new DateTime();
@@ -83,6 +89,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->dateModification = new DateTime();
         return $this;
     }
+
+    public function getNewEmail(): ?string
+    {
+        return $this->newEmail;
+    }
+
+    public function setNewEmail(?string $newEmail): self
+    {
+        $this->newEmail = $newEmail;
+        $this->dateModification = new DateTime();
+
+        return $this;
+    }
+
 
     public function getUserIdentifier(): string
     {

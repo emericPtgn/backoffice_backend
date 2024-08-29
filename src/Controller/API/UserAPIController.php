@@ -2,15 +2,13 @@
 
 namespace App\Controller\API;
 
-use App\Document\User;
 use App\Service\UserService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,7 +27,7 @@ class UserAPIController extends AbstractController
         $this->mailer = $mailer;
     }
 
-    #[IsGranted('ROLE_ADMIN', '', 'you do not have access to users informations')]
+    #[IsGranted('ROLE_ADMIN', '', 'you do not have right to add user')]
     #[Route('/api/user', name: 'api_user_new_user', methods: ['POST'])]
     public function addUser(Request $request) : JsonResponse
     {
@@ -41,6 +39,15 @@ class UserAPIController extends AbstractController
         $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'user']);
         return new JsonResponse($serializedResponse, 200, [], true);
     }
+
+    #[Route('/api/user/validate-user/{token}', name: 'api_user_validate_new_user', methods: 'POST')]
+    public function validateUser(Request $request, string $token){
+        $requestData = json_decode($request->getContent(), true);
+        $response = $this->userService->confirmUser($requestData, $token);
+        $serializedResponse = $this->serializer->serialize($response, 'json');
+        return new JsonResponse($serializedResponse, 200, [], true);
+}
+   
 
     #[IsGranted('ROLE_ADMIN', '', 'you do not have access to users informations')]
     #[Route('/api/user/{id}', name: 'api_user_remove_user', methods: ['DELETE'])]
@@ -61,7 +68,7 @@ class UserAPIController extends AbstractController
     }
 
     // #[IsGranted('ROLE_ADMIN', null, 'you do not have access to users informations')]
-    #[Route('/api/user', name: 'api_user_get_users', methods: ['GET'])]
+    #[Route('/api/user', name: 'api_user_get_users', methods: ['GET', 'OPTIONS'])]
     // declaration getUserDatas because of getUser from abstractController 
     public function getUsers()
     {
@@ -71,20 +78,20 @@ class UserAPIController extends AbstractController
     }
 
 
-    #[Route('/api/user/activ-user', name: 'api_user_get_activ_user', methods: ['GET'])]
+    #[Route('/api/user/activ-user', name: 'api_user_get_activ_user', methods: ['GET', 'OPTIONS'])]
     public function getActivUser() : JsonResponse {
         $user = $this->getUser();
         $serializedUser = $this->serializer->serialize($user, 'json', ['groups' => 'user']);
         return new JsonResponse($serializedUser, 200, [], true); 
     }
 
-    #[Route('/api/user/{id}', name: 'api_user_get_user', methods: ['GET'])]
+    #[Route('/api/user/{id}', name: 'api_user_get_user', methods: ['GET', 'OPTIONS'])]
     public function getThisUser(string $id){
         $user = $this->userService->getThisUser($id);
         $serializedUser = $this->serializer->serialize($user, 'json', ['groups' => 'user']);
         return new JsonResponse($serializedUser, 200, [], true);
     }
-    #[Route('/api/user/askNewPassword/{id}', name: 'api_user_askNewPassowrd', methods: ['GET'])]
+    #[Route('/api/user/askNewPassword/{id}', name: 'api_user_askNewPassowrd', methods: ['GET', 'OPTIONS'])]
     public function askNewPassword(string $id, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $user = $this->userService->getThisUser($id);
@@ -97,10 +104,34 @@ class UserAPIController extends AbstractController
     #[Route('/api/user/{token}', name: 'api_user_resetPassword', methods: ['POST'])]
     public function updatePassword(Request $request, string $token){
         $requestDatas = json_decode($request->getContent(), true);
-        $response = $this->userService->resetPassword($requestDatas, $token);
+        $password = $requestDatas['password'] ?? null; // Assurez-vous que la clé correspond à ce que vous envoyez dans la requête
+        $response = $this->userService->resetPassword($password, $token);
         $serializedResponse = $this->serializer->serialize($response, 'json');
         return new JsonResponse($serializedResponse, 200, [], true);
     }
+
+    #[Route('/api/user/update-mail/{id}', name: 'api_user_updateMail', methods: ['POST'])]
+    public function updateEmail(string $id, Request $request){
+        $requestData = json_decode($request->getContent(),true);
+        $user = $this->userService->getThisUser($id);
+        $response = $this->userService->sendChangeEmail($user, $requestData);
+        $serializedResponse = $this->serializer->serialize($response, 'json');
+        return new JsonResponse($serializedResponse, 200, [], true);
+
+    }
+
+    #[Route('/api/user/confirm-email/{token}', name: 'api_user_confirmEmail', methods: ['GET', 'OPTIONS'])]
+    public function confirmEmail(string $token){
+    $response = $this->userService->confirmEmail($token);
+
+    return match ($response['status']) {
+        'success' => new RedirectResponse('https://localhost:3000/login', 302),
+        'expired' => new JsonResponse(['error' => $response['message']], 410),
+        'invalid' => new JsonResponse(['error' => $response['message']], 400),
+        default => new JsonResponse(['error' => 'Unexpected error occurred.'], 500),
+    };
+}
+
 
 
 }

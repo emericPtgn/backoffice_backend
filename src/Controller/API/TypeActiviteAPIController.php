@@ -33,14 +33,14 @@ class TypeActiviteAPIController extends AbstractController {
         return new JsonResponse($newTypeActivity, 200, [], false);
     }
 
-    #[Route('/api/type_activity/{id}', name: 'api_typeActivity_get', methods: ['GET'])]
+    #[Route('/public/api/type_activity/{id}', name: 'api_typeActivity_get', methods: ['GET'])]
     public function getTypeActivity(string $id) : JsonResponse {
         $typeActivity = $this->typeActiviteService->getTypeActivity($id);
         $serializedTypeActivity = $this->serializer->serialize($typeActivity, 'json', ['groups' => 'activite']);
         return new JsonResponse($serializedTypeActivity, 200, [], true);
     }
 
-    #[Route('/api/type_activity', name: 'api_typeActivity_getAll', methods: ['GET'])]
+    #[Route('/public/api/type_activity', name: 'api_typeActivity_getAll', methods: ['GET'])]
     public function getAllTypesActivities() : JsonResponse {
         $allTypesActivies = $this->typeActiviteService->getAllTypesActivities();
         $serializedTypeActivities = $this->serializer->serialize($allTypesActivies, 'json', ['groups' => 'activite']);

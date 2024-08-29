@@ -31,14 +31,14 @@ class ReseauSocialAPIController extends AbstractController {
         return new JsonResponse($updatedSocial, 200, [], false);
     }
 
-    #[Route('/api/social/{id}', name: 'api_social_get', methods: ['GET'])]
+    #[Route('/public/api/social/{id}', name: 'api_social_get', methods: ['GET'])]
     public function getSocial(string $id){
         $social = $this->reseauSocialService->getSocial($id);
         $serializedSocial = $this->serializer->serialize($social, 'json');
         return new JsonResponse($serializedSocial, 200, [], true);
     }
 
-    #[Route('/api/social', name: 'api_social_getAll', methods: ['GET'])]
+    #[Route('/public/api/social', name: 'api_social_getAll', methods: ['GET'])]
     public function getAllSocials(string $id){
         $socials = $this->reseauSocialService->getAllSocials();
         $serializedSocials = $this->serializer->serialize($socials, 'json');

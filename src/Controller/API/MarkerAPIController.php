@@ -51,13 +51,13 @@ class MarkerAPIController extends AbstractController {
         $serializedMarker = $this->serializer->serialize($newMarker, 'json', ['groups' => 'marker']);
         return new JsonResponse($serializedMarker, 200, [], true);
     }
-    #[Route('/api/marker/{id}', name: 'api_marker_get', methods: ['GET'])]
+    #[Route('/public/api/marker/{id}', name: 'api_marker_get', methods: ['GET'])]
     public function getMarker(string $id){
         $marker = $this->markerService->getMarker($id);
         $serializedMarker = $this->serializer->serialize($marker, 'json', ['groups' => 'marker']);
         return new JsonResponse($serializedMarker, 200, [], true);
     }
-    #[Route('/api/marker', name: 'api_marker_getAllMarkers', methods: ['GET'])]
+    #[Route('/public/api/marker', name: 'api_marker_getAllMarkers', methods: ['GET'])]
     public function getAllMarker(){
         $markers = $this->markerService->getAllMarker();
         $serializedMarker = $this->serializer->serialize($markers, 'json', ['groups' => 'marker']);

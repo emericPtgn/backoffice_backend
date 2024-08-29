@@ -32,7 +32,7 @@ class ReseauSocialService {
     }
 
     public function updateSocial(string $id, array $requestDatas){
-        $social = $this->dm->getRepository(ReseauSocial::class)->find($id);
+        $social = $this->reseauSocialRepo->find($id);
         if(!$social){
             return ['message' => 'no social account found with this ID'];
         } else {
@@ -54,7 +54,7 @@ class ReseauSocialService {
     }
 
     public function getSocial(string $id){
-        $social = $this->dm->getRepository(ReseauSocial::class)->find($id);
+        $social = $this->reseauSocialRepo->find($id);
         if(!$social){
             return ['message' => 'no social account found with this ID']; 
         } else {
@@ -63,7 +63,7 @@ class ReseauSocialService {
     }
 
     public function getAllSocials(){
-        $allSocials = $this->dm->getRepository(ReseauSocial::class)->findAll();
+        $allSocials = $this->reseauSocialRepo->findAll();
         if(!$allSocials){
             return ['message' => 'no socials found, create a new one!'];
         }
@@ -71,6 +71,11 @@ class ReseauSocialService {
     }
 
     public function deleteSocial(string $id){
-        return $this->reseauSocialRepo->deleteSocial($id);
+        $social = $this->reseauSocialRepo->find($id);
+        if(!$social){
+            return ['message' => "no social found"];
+        } else {
+            $this->dm->remove($social);
+        }
     }
 }

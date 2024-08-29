@@ -46,14 +46,14 @@ class ProgrammationAPIController extends AbstractController {
         return new JsonResponse($serializedResponse, 200, [], true);
     } 
 
-    #[Route('/api/programmation/{id}', name: 'api_programmation_get', methods:['GET'])]
+    #[Route('/public/api/programmation/{id}', name: 'api_programmation_get', methods:['GET'])]
     public function getProgrammation(string $id) : JsonResponse {
         $response = $this->programmationService->getProgrammation($id);
         $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'programmation']);
         return new JsonResponse($serializedResponse, 200, [], true);
     }
 
-    #[Route('/api/programmation', name: 'api_programmation_get_liste', methods:['GET'])]
+    #[Route('/public/api/programmation', name: 'api_programmation_get_liste', methods:['GET'])]
     public function getAllProgrammations() : JsonResponse {
         $response = $this->programmationService->getAllProgrammations();
         $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'programmation']);
