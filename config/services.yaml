@@ -7,6 +7,7 @@ parameters:
     env(MONGODB_URL): ''
     env(MONGODB_DB): ''
 
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -24,10 +25,60 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
-    App\Repository\ArtisteRepository:
-        class: App\Repository\ArtisteRepository
-        arguments:
-            - '@doctrine_mongodb.odm.document_manager'
-        tags: ['doctrine.repository_service']
+    # App\Repository\ArtisteRepository:
+    #     class: App\Repository\ArtisteRepository
+    #     arguments:
+    #         - '@doctrine_mongodb.odm.document_manager'
+    #     tags: ['doctrine.repository_service']
+
+    App\EventListener\AuthenticationSuccessListener:
+        tags:
+            - { name: kernel.event_listener, event: security.interactive_login, method: onAuthenticationSuccess }
 
     Doctrine\Persistence\ManagerRegistry: '@doctrine_mongodb'
+    App\Controller\CustomerLoginController:
+        public: true
+        autowire: true
+        autoconfigure: true
+
+    App\Repository\ActiviteRepository:
+        arguments:
+            $dm: '@doctrine_mongodb.odm.document_manager'
+        calls:
+            - setLogger: ['@logger']
+
+
+    App\EventListener\ExceptionListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception }
+
+    App\Repository\ArtisteRepository:
+        arguments:
+            $dm: '@doctrine_mongodb.odm.document_manager'
+        calls:
+            - setLogger: ['@logger']
+
+
+    App\Repository\CommerceRepository:
+        arguments:
+            $dm: '@doctrine_mongodb.odm.document_manager'
+        calls:
+            - setLogger: ['@logger']
+
+    App\EventSubscriber\MarkerSubscriber:
+        tags:
+            - { name: doctrine_mongodb.odm.event_subscriber }
+    
+    App\EventSubscriber\ArtisteSubscriber:
+        tags:
+            - { name: doctrine_mongodb.odm.event_subscriber }
+
+    App\EventSubscriber\ActiviteSubscriber:
+        tags:
+            - { name: doctrine_mongodb.odm.event_subscriber }
+
+    App\EventListener\CorsListener:
+        tags:
+            - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+

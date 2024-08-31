@@ -3,33 +3,49 @@
 namespace App\Document;
 
 use App\Repository\CommerceRepository;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 #[MongoDB\Document(repositoryClass: CommerceRepository::class, collection: 'commerce')]
 class Commerce
 {
     #[MongoDB\Id]
-    private string $id;
+    #[Groups(["commerce"])]
+    private ?string $id = null;
 
     #[MongoDB\Field(type: "string")]
-    private string $nom;
+    #[Groups(["commerce"])]
+    private ?string $nom = null;
 
     #[MongoDB\Field(type: "string")]
-    private string $description;
-
-    #[MongoDB\EmbedOne(targetDocument: Emplacement::class)]
-    private Emplacement $emplacement;
+    #[Groups(["commerce"])]
+    private ?string $description = null;
 
     #[MongoDB\Field(type: "string")]
-    private string $reseauSocial;
+    #[Groups(["commerce"])]
+    private ?string $reseauSocial = null;
+
+    #[MongoDB\ReferenceOne(targetDocument: Emplacement::class)]
+    #[Groups(["commerce"])]
+    private ?Emplacement $emplacement = null;
+
+    #[MongoDB\ReferenceOne(targetDocument: Marker::class)]
+    #[Groups(["commerce"])]
+    private ?Marker $marker = null;
 
     #[MongoDB\ReferenceOne(targetDocument: TypeCommerce::class)]
-    private TypeCommerce $typeCommerce;
+    #[Groups(["commerce"])]
+    private ?TypeCommerce $typeCommerce = null;
 
     #[MongoDB\ReferenceOne(targetDocument: TypeProduit::class)]
-    private TypeProduit $typeProduit;
+    #[Groups(["commerce"])]
+    private ?TypeProduit $typeProduit = null;
 
-    public function getId(): string
+    #[MongoDB\Field(type: 'collection')]
+    #[Groups(["commerce"])]
+    private ?array $photos = [];
+
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -40,7 +56,7 @@ class Commerce
         return $this;
     }
 
-    public function getNom(): string
+    public function getNom(): ?string
     {
         return $this->nom;
     }
@@ -51,7 +67,7 @@ class Commerce
         return $this;
     }
 
-    public function getDescription(): string
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -62,7 +78,7 @@ class Commerce
         return $this;
     }
 
-    public function getEmplacement(): Emplacement
+    public function getEmplacement(): ?Emplacement
     {
         return $this->emplacement;
     }
@@ -73,7 +89,18 @@ class Commerce
         return $this;
     }
 
-    public function getReseauSocial(): string
+    public function getMarker(): ?Marker
+    {
+        return $this->marker;
+    }
+
+    public function setMarker(?Marker $marker): self
+    {
+        $this->marker = $marker;
+        return $this;
+    }
+
+    public function getReseauSocial(): ?string
     {
         return $this->reseauSocial;
     }
@@ -84,7 +111,7 @@ class Commerce
         return $this;
     }
 
-    public function getTypeCommerce(): TypeCommerce
+    public function getTypeCommerce(): ?TypeCommerce
     {
         return $this->typeCommerce;
     }
@@ -95,7 +122,7 @@ class Commerce
         return $this;
     }
 
-    public function getTypeProduit(): TypeProduit
+    public function getTypeProduit(): ?TypeProduit
     {
         return $this->typeProduit;
     }
@@ -103,6 +130,17 @@ class Commerce
     public function setTypeProduit(TypeProduit $typeProduit): self
     {
         $this->typeProduit = $typeProduit;
+        return $this;
+    }
+
+    public function getPhotos(): array
+    {
+        return $this->photos;
+    }
+
+    public function setPhotos(?array $photos = null): self
+    {
+        $this->photos = $photos;
         return $this;
     }
 }

@@ -2,111 +2,192 @@
 
 namespace App\Document;
 
-use App\Repository\ActiviteRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
-
-
-#[MongoDB\Document(repositoryClass: ActiviteRepository::class, collection: 'activite')]
+#[MongoDB\Document(repositoryClass: "App\Repository\ActiviteRepository", collection: "activite")]
 class Activite
 {
-    #[MongoDB\Id]
-    private string $id;
+    #[MongoDB\Id(strategy: "AUTO")]
+    #[Groups(["activite", "artiste"])]
+    protected ?string $id = null;
+
+    #[MongoDB\Field(type: 'string', name: 'nom')]
+    #[Groups(["activite", "artiste"])]
+    protected ?string $nom = null;
+
+    #[MongoDB\Field(type: 'date', name: 'date')]
+    #[Groups(["activite", "artiste"])]
+    protected ?\DateTime $date = null;
+
+    #[MongoDB\Field(type: 'string', name: 'formattedDate')]
+    #[Groups(["activite", "artiste"])]
+    protected ?string $formattedDate = null;
+
+    #[MongoDB\Field(type: 'string', name: 'type')]
+    #[Groups(["activite", "artiste"])]
+    protected ?string $type = null;
+
+    #[MongoDB\Field(type: 'string', name: 'description')]
+    #[Groups(["activite", "artiste"])]
+    protected ?string $description = null;
+
+    #[MongoDB\ReferenceOne(targetDocument: Marker::class)]
+    #[Groups(["activite", "artiste"])]
+    private ?Marker $marker = null;
+
+    #[MongoDB\ReferenceMany(targetDocument: Artiste::class, cascade: ['persist'])]
+    #[Groups(["activite"])]
+    #[MaxDepth(1)]
+    private ?Collection $artistes = null;
 
     #[MongoDB\Field(type: "string")]
-    private string $nom;
-
-    #[MongoDB\Field(type: "date")]
-    private \DateTime $date;
+    #[Groups(["activite", "artiste"])]
+    private ?string $artistesNames = null;
 
     #[MongoDB\Field(type: "string")]
-    private string $type; // Peut être 'concert', 'dedicace', 'jeu divers'
+    #[Groups(["activite", "artiste"])]
+    private ?string $artistesIds = null;
 
-    #[MongoDB\EmbedOne(targetDocument: Emplacement::class)]
-    private Emplacement $emplacement;
 
-    #[MongoDB\ReferenceOne(targetDocument: TypeActivite::class)]
-    private TypeActivite $typeActivite;
+    public function __construct()
+    {
+        $this->artistes = new ArrayCollection();
+    }
 
-    #[MongoDB\EmbedOne(targetDocument: Artiste::class)]
-    private Artiste $artiste;
-
-    // Autres propriétés et méthodes communes...
-
-    public function getId(): string
+    public function getId(): ?string
     {
         return $this->id;
     }
 
-    public function setId(string $id): self
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    public function getNom(): string
+    public function getNom(): ?string
     {
         return $this->nom;
     }
 
-    public function setNom(string $nom): self
+    public function setNom(?string $nom): self
     {
         $this->nom = $nom;
         return $this;
     }
 
-    public function getDate(): \DateTime
+    public function getDate(): ?\DateTime
     {
         return $this->date;
     }
 
-    public function setDate(\DateTime $date): self
+    public function setDate(?\DateTime $date): self
     {
-        $this->date = $date;
+        if ($date) {
+            $utcDate = clone $date;
+            $utcDate->setTimezone(new \DateTimeZone("UTC"));
+            $this->date = $utcDate;
+        } else {
+            $this->date = null;
+        }
         return $this;
     }
 
-    public function getType(): string
+    public function getFormattedDate(): ?string
+    {
+        if (!$this->date) {
+            return null;
+        }
+
+        $utcDate = clone $this->date;
+        $utcDate->setTimezone(new \DateTimeZone("UTC"));
+
+        return $utcDate->format('Y-m-d\TH:i');
+    }
+
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType(string $type): self
+    public function setType(?string $type): self
     {
         $this->type = $type;
         return $this;
     }
 
-    public function getEmplacement(): Emplacement
+    public function getMarker(): ?Marker
     {
-        return $this->emplacement;
+        return $this->marker;
     }
 
-    public function setEmplacement(Emplacement $emplacement): self
+    public function setMarker(?Marker $marker): self
     {
-        $this->emplacement = $emplacement;
+        $this->marker = $marker;
         return $this;
     }
 
-    public function getTypeActivite(): TypeActivite
+    public function getArtistes(): Collection
     {
-        return $this->typeActivite;
+        return $this->artistes;
     }
 
-    public function setTypeActivite(TypeActivite $typeActivite): self
+    public function addArtiste(Artiste $artiste): self
     {
-        $this->typeActivite = $typeActivite;
+        if (!$this->artistes->contains($artiste)) {
+            $this->artistes->add($artiste);
+            $this->updateArtistesNames();
+            $this->updateArtistesIds();
+        }
         return $this;
     }
 
-    public function getArtiste(): Artiste
+    public function removeArtiste(Artiste $artiste): self
     {
-        return $this->artiste;
-    }
-
-    public function setArtiste(Artiste $artiste): self
-    {
-        $this->artiste = $artiste;
+        if ($this->artistes->removeElement($artiste)) {
+            $artiste->removeActivite($this); 
+            $this->updateArtistesNames();
+            $this->updateArtistesIds();
+        }
         return $this;
     }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function getArtistesNames(): ?string
+    {
+        return $this->artistes->isEmpty() ? '' : implode(', ', $this->artistes->map(function(Artiste $artiste) {
+            return $artiste->getNom();
+        })->toArray());
+    }
+    
+
+    private function updateArtistesNames(): void
+    {
+        $this->artistesNames = $this->getArtistesNames();
+    }
+    
+
+    public function getArtistesIds(): ?string
+    {
+        return $this->artistes->isEmpty() ? '' : implode(', ', $this->artistes->map(function(Artiste $artiste) {
+            return $artiste->getId();
+        })->toArray());
+    }
+    
+
+    private function updateArtistesIds(): void
+    {
+        $this->artistesIds = $this->getArtistesIds();
+    }
+
+
+
 }

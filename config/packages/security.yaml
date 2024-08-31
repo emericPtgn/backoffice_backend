@@ -1,24 +1,19 @@
 security:
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    
     providers:
-        # used to reload user from session & other features (e.g. switch_user)
-        app_user_provider:
-            mongodb:
-                class: App\Document\User
-                property: email
+        my_mongo_provider:
+            mongodb: {class: App\Document\User, property: email}
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+        public:
+            pattern: ^/public/api
+            security: false
 
         login:
             pattern: ^/api/login
@@ -31,27 +26,32 @@ security:
         api:
             pattern: ^/api
             stateless: true
+            entry_point: jwt
             jwt: ~
+            refresh_jwt:
+                check_path: /api/token/refresh # or, you may use the `api_refresh_token` route name
+                # or if you have more than one user provider
+                # provider: user_provider_name
+
 
         main:
             lazy: true
-            provider: app_user_provider
-            form_login:
-                login_path: app_login
-                check_path: app_login
-                enable_csrf: true
+            provider: my_mongo_provider
             logout:
                 path: app_logout
-                # where to redirect after logout
-                # target: app_any_route
-
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
+            custom_authenticator: 
+                App\Security\CustomAuthenticator
 
     access_control:
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: PUBLIC_ACCESS, methods: [OPTIONS] }  # Ajoutez cette ligne
+        - { path: ^/api/(login|token/refresh), roles: PUBLIC_ACCESS }
+        - { path: ^/api/user/confirm-email, roles: PUBLIC_ACCESS }
+        - { path: ^/api/user/validate-user, roles: PUBLIC_ACCESS }
+        - { path: ^/api/logout, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/public, roles: PUBLIC_ACCESS }
 
+        
 when@test:
     security:
         password_hashers:

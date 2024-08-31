@@ -2,12 +2,15 @@
 
 namespace App\Service;
 use App\Document\ReseauSocial;
+use App\Repository\ReseauSocialRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 class ReseauSocialService {
     private DocumentManager $dm;
-    public function __construct(DocumentManager $dm){
+    private ReseauSocialRepository $reseauSocialRepo;
+    public function __construct(DocumentManager $dm, ReseauSocialRepository $reseauSocialRepo){
         $this->dm = $dm;
+        $this->reseauSocialRepo = $reseauSocialRepo;
     }
     public function addNewSocial(array $requestDatas){
         $newReseauSocial = new ReseauSocial();
@@ -29,7 +32,7 @@ class ReseauSocialService {
     }
 
     public function updateSocial(string $id, array $requestDatas){
-        $social = $this->dm->getRepository(ReseauSocial::class)->find($id);
+        $social = $this->reseauSocialRepo->find($id);
         if(!$social){
             return ['message' => 'no social account found with this ID'];
         } else {
@@ -51,7 +54,7 @@ class ReseauSocialService {
     }
 
     public function getSocial(string $id){
-        $social = $this->dm->getRepository(ReseauSocial::class)->find($id);
+        $social = $this->reseauSocialRepo->find($id);
         if(!$social){
             return ['message' => 'no social account found with this ID']; 
         } else {
@@ -60,10 +63,19 @@ class ReseauSocialService {
     }
 
     public function getAllSocials(){
-        $allSocials = $this->dm->getRepository(ReseauSocial::class)->findAll();
+        $allSocials = $this->reseauSocialRepo->findAll();
         if(!$allSocials){
             return ['message' => 'no socials found, create a new one!'];
         }
         return $allSocials;
+    }
+
+    public function deleteSocial(string $id){
+        $social = $this->reseauSocialRepo->find($id);
+        if(!$social){
+            return ['message' => "no social found"];
+        } else {
+            $this->dm->remove($social);
+        }
     }
 }

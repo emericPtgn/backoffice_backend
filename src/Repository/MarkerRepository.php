@@ -12,4 +12,5 @@ class MarkerRepository extends DocumentRepository {
         $classMetaData = $dm->getClassMetadata(Marker::class);
         parent::__construct($dm, $uow, $classMetaData);
     }
+
 }

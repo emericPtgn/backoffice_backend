@@ -3,18 +3,25 @@
 namespace App\Controller\API;
 
 use App\Service\ActiviteService;
+use Psr\Log\LoggerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
-class ActiviteAPIController {
+class ActiviteAPIController extends AbstractController {
 
     private ActiviteService $activiteService;
+    private SerializerInterface $serializer;
+    private LoggerInterface $logger;
 
-    public function __construct(ActiviteService $activiteService){
+    public function __construct(ActiviteService $activiteService, SerializerInterface $serializer, LoggerInterface $logger){
         $this->activiteService = $activiteService;
+        $this->serializer = $serializer;
+        $this->logger = $logger;
     }
 
     #[Route('/api/activity', name: 'api_activity_new_activity', methods: ['POST'])]
@@ -25,14 +32,16 @@ class ActiviteAPIController {
             return new JsonResponse(['erreor' => 'invalid Json'], Response::HTTP_BAD_REQUEST);
         }
         $activity = $this->activiteService->addActivity($requestDatas);
-        return new JsonResponse($activity, 200, [], false);
+        $serializedActivity = $this->serializer->serialize($activity, 'json', ['groups' => 'activite']);
+        return new JsonResponse($serializedActivity, 200, [], true);
     }
 
     #[Route('/api/activity/{id}', name: 'api_activity_delete_activity', methods: ['DELETE'])]
     public function deleteActivity(string $id) : JsonResponse
     {
-        $response = $this->activiteService->removeActivity($id);
-        return new JsonResponse($response, 200, [], false);
+        $response = $this->activiteService->deleteActivity($id);
+        $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'activite']);
+        return new JsonResponse($serializedResponse, 200, [], true);
     }
 
     // gère la mise à jour d'une activity
@@ -42,21 +51,24 @@ class ActiviteAPIController {
     {
         $requestDatas = json_decode($request->getContent(), true);
         $activity = $this->activiteService->updateActivity($id, $requestDatas);
-        return new JsonResponse($activity, 200, [], false);
+        $serializeResponse = $this->serializer->serialize($activity, 'json', ['groups' => 'activite']);
+        return new JsonResponse($serializeResponse, 200, [], true);
     }
 
-    #[Route('/api/activity', name: 'api_activity_get_activities', methods: ['GET'])]
+    #[Route('/public/api/activity', name: 'api_activity_get_activities', methods: ['GET'])]
     public function getActivities() : JsonResponse
     {
         $activities = $this->activiteService->getActivities();
-        return new JsonResponse($activities, 200, [], false);
+        $serializedActivity = $this->serializer->serialize($activities, 'json', ['groups' => 'activite', 'artiste']);
+        return new JsonResponse($serializedActivity, 200, [], true);
     }
 
-    #[Route('/api/activity/{id}', name: 'app_activity_get_activity', methods:['GET'])]
+    #[Route('/public/api/activity/{id}', name: 'api_activity_get_activity', methods:['GET'])]
     public function getActivity(string $id): JsonResponse
     {
         $activity = $this->activiteService->getActivity($id);
-        return new JsonResponse($activity, 200, [], false);
+        $serializedActivity = $this->serializer->serialize($activity, 'json', ['groups' => 'activite', 'artiste']);
+        return new JsonResponse($serializedActivity, 200, [], true);
     }
 
 }

@@ -12,5 +12,7 @@ class ReseauSocialRepository extends DocumentRepository {
         $classMetaData = $dm->getClassMetadata(ReseauSocial::class);
         parent::__construct($dm, $uow, $classMetaData);
     }
+
+
     
 }

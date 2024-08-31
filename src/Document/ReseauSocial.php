@@ -3,6 +3,7 @@
 namespace App\Document;
 
 use App\Repository\ReseauSocialRepository;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 
 #[MongoDB\Document(repositoryClass: ReseauSocialRepository::class, collection: 'reseauSocial')]
@@ -10,19 +11,24 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 class ReseauSocial {
 
     #[MongoDB\Id(strategy:"AUTO")]
-    private string $id; 
+    #[Groups(["artiste", "social"])]
+    private ?string $id = null; 
 
     #[MongoDB\Field(type: 'string', name: 'plateforme')]
-    private string $plateforme;
+    #[Groups(["artiste", "social"])]
+    private ?string $plateforme = null;
 
     #[MongoDB\Field(type: 'string', name: 'url')]
-    private string $url;
+    #[Groups(["artiste", "social"])]
+    private ?string $url = null;
     
     #[MongoDB\Field(type: 'string', name: 'pseudo')]
-    private string $pseudo;
+    #[Groups(["artiste", "social"])]
+    private ?string $pseudo = null;
 
     #[MongoDB\Field(type:'string', name: 'icone_url')]
-    private string $icone;
+    #[Groups(["artiste", "social"])]
+    private ?string $icone = null;
 
     // Getter pour id
     public function getId(): string

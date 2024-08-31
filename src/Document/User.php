@@ -5,6 +5,7 @@ namespace App\Document;
 use App\Repository\UserRepository;
 use App\Security\Roles;
 use DateTime;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -16,31 +17,55 @@ use App\Validator\ValidRoles;
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[MongoDB\Id]
+    #[Groups(['user'])]
     private string $id;
 
     #[MongoDB\Field(type: 'string')]
     #[Assert\NotBlank]
     #[Assert\Email]
+    #[Assert\Unique(fields:['email'], message: 'This email is already in use.')]
+    #[Groups(['user'])]
     private ?string $email = null;
+
+    #[MongoDB\Field(type: 'string')]
+    #[Assert\Unique(fields: ['email'], message: 'new mail should be unique.')]
+    #[Groups(['user'])]
+    private ?string $newEmail = null;
 
     #[MongoDB\Field(type: 'string')]
     #[Assert\NotBlank]
     private ?string $password = null;
 
     #[MongoDB\Field(type: 'collection')]
+    #[Groups(['user'])]
     private array $roles = [];
 
     #[MongoDB\Field(type: 'string')]
+    #[Groups(['user'])]
     private ?string $nom = null;
 
     #[MongoDB\Field(type: 'collection')]
+    #[Groups(['user'])]
     private ?array $groupes = [];
 
     #[MongoDB\Field(type: 'date')]
+    #[Groups(['user'])]
     private ?DateTime $dateCreation = null;
 
     #[MongoDB\Field(type: 'date')]
+    #[Groups(['user'])]
     private ?DateTime $dateModification = null;
+
+    #[MongoDB\Field(type: 'boolean')]
+    #[Groups(['user'])]
+    private bool $isVerified = false;
+
+    #[MongoDB\Field(type: 'string')]
+    private ?string $verificationToken = null;
+
+    #[MongoDB\Field(type: 'date')]
+    private ?DateTime $verificationTokenExpiresAt = null;
+
 
     public function __construct()
     {
@@ -65,6 +90,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function getNewEmail(): ?string
+    {
+        return $this->newEmail;
+    }
+
+    public function setNewEmail(?string $newEmail): self
+    {
+        $this->newEmail = $newEmail;
+        $this->dateModification = new DateTime();
+
+        return $this;
+    }
+
+
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
@@ -73,7 +112,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        $roles[] = 'ROLE_USER';
         return array_unique($roles);
     }
 
@@ -148,6 +186,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setDateModification(DateTime $dateModification): self
     {
         $this->dateModification = $dateModification;
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function getVerificationToken(): ?string
+    {
+        return $this->verificationToken;
+    }
+
+    public function getVerificationTokenExpiresAt(): ?DateTime
+    {
+        return $this->verificationTokenExpiresAt;
+    }
+
+    public function setIsVerified(bool $isVerified): self
+    {
+        $this->isVerified = $isVerified;
+        return $this;
+    }
+
+    public function setVerificationToken(?string $verificationToken): self
+    {
+        $this->verificationToken = $verificationToken;
+        return $this;
+    }
+
+    public function setVerificationTokenExpiresAt(?DateTime $verificationTokenExpiresAt): self
+    {
+        $this->verificationTokenExpiresAt = $verificationTokenExpiresAt;
         return $this;
     }
 }

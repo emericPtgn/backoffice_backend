@@ -59,12 +59,28 @@ DirectoryIndex index.php
     RewriteRule ^ %{ENV:BASE}/index.php [L]
 </IfModule>
 
-<IfModule !mod_rewrite.c>
-    <IfModule mod_alias.c>
-        # When mod_rewrite is not available, we instruct a temporary redirect of
-        # the start page to the front controller explicitly so that the website
-        # and the generated links can still be used.
-        RedirectMatch 307 ^/$ /index.php/
-        # RedirectTemp cannot be used instead
-    </IfModule>
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Vérifier si l'origine est l'une des origines autorisées
+    RewriteCond %{HTTP:Origin} ^https://localhost:3000$ [OR]
+    RewriteCond %{HTTP:Origin} ^https://localhost:3001$
+    RewriteRule ^ - [E=ORIGIN:%{HTTP:Origin}]
 </IfModule>
+
+<IfModule mod_headers.c>
+    # Définir les en-têtes CORS seulement si la variable d'environnement ORIGIN est définie
+    Header set Access-Control-Allow-Origin "%{ORIGIN}e" env=ORIGIN
+    Header set Access-Control-Allow-Credentials "true" env=ORIGIN
+    Header set Access-Control-Allow-Methods "POST, GET, OPTIONS, DELETE, PUT" env=ORIGIN
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization" env=ORIGIN
+
+    # Autoriser les pré-demandes OPTIONS
+    Header always set Access-Control-Max-Age "3600" env=ORIGIN
+</IfModule>
+
+
+
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+
+
