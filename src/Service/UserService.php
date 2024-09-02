@@ -107,7 +107,7 @@ class UserService {
     }
 
     public function sendMailConfirmNewUser(string $email, string $token){
-        $validateUrl = "https://localhost:3000/signin/$token";
+        $validateUrl = "https://pro.testdwm.fr/signin/$token";
         // Préparation de l'email
         $email = (new Email())
             ->from('dataisbeautyfull@gmx.com')
@@ -244,7 +244,7 @@ class UserService {
         }
     
         // Construction de l'URL de réinitialisation de mot de passe
-        $resetPassUrl = "https://localhost:3000/reset-password/$token";
+        $resetPassUrl = "https://pro.testdwm.fr/reset-password/$token";
     
         // Préparation de l'email
         $email = (new Email())
@@ -312,7 +312,7 @@ class UserService {
         $this->dm->flush();
     
         // Construction de l'URL de confirmation d'email
-        $confirmUrl = "https://localhost/api/user/confirm-email/$token";
+        $confirmUrl = "https://api.testdwm.fr/api/user/confirm-email/$token";
     
         // Préparation de l'email
         $emailMessage = (new Email())

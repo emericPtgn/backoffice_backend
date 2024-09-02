@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Utils;
+namespace App\Utils;
 
 use App\Document\Activite;
 

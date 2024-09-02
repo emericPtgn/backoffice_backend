@@ -113,6 +113,6 @@ public function registerAction(Request $request, UserPasswordHasherInterface $pa
 
         $this->addFlash('success', 'Votre email a été vérifié. Vous pouvez maintenant vous connecter.');
 
-        return $this->redirect('https://localhost:3000/login');
+        return $this->redirect('https://pro.testdwm.fr/login');
     }
 };
