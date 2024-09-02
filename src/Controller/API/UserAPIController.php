@@ -125,7 +125,7 @@ class UserAPIController extends AbstractController
     $response = $this->userService->confirmEmail($token);
 
     return match ($response['status']) {
-        'success' => new RedirectResponse('https://localhost:3000/login', 302),
+        'success' => new RedirectResponse('https://pro.testdwm.fr/login', 302),
         'expired' => new JsonResponse(['error' => $response['message']], 410),
         'invalid' => new JsonResponse(['error' => $response['message']], 400),
         default => new JsonResponse(['error' => 'Unexpected error occurred.'], 500),
