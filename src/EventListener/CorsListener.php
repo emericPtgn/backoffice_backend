@@ -13,7 +13,7 @@ class CorsListener
 
         if ($response instanceof RedirectResponse) {
             // Ajoutez ici vos en-têtes CORS
-            $response->headers->set('Access-Control-Allow-Origin', 'https://localhost:3000');
+            $response->headers->set('Access-Control-Allow-Origin', 'https://pro.testdwm.fr');
             $response->headers->set('Access-Control-Allow-Credentials', 'true');
             // Ajoutez d'autres en-têtes si nécessaire
         }

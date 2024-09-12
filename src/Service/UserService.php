@@ -58,6 +58,7 @@ class UserService {
     
         // Attribution des données au nouvel utilisateur
         $user->setEmail($requestDatas['newMail']);
+        $user->setVerificationToken($this->generateToken());
     
         if (isset($requestDatas['newRoles']) && is_array($requestDatas['newRoles'])) {
             $user->setRoles($requestDatas['newRoles']);
@@ -69,6 +70,7 @@ class UserService {
             // Persistance du nouvel utilisateur dans la base de données
             $this->dm->persist($user);
             $this->dm->flush();
+            $this->sendMailConfirmNewUser($user->getEmail(), $user->getVerificationToken());
         } catch (\Exception $e) {
             // Gestion des erreurs lors de l'enregistrement en base de données
             throw new \RuntimeException('Failed to save the user: ' . $e->getMessage());
@@ -107,7 +109,7 @@ class UserService {
     }
 
     public function sendMailConfirmNewUser(string $email, string $token){
-        $validateUrl = "https://localhost:3000/signin/$token";
+        $validateUrl = "https://pro.testdwm.fr/signin/$token";
         // Préparation de l'email
         $email = (new Email())
             ->from('dataisbeautyfull@gmx.com')
@@ -167,17 +169,21 @@ class UserService {
         if (!$user) {
             return ['message' => 'this user does not exist'];
         }
-        
-        if (isset($requestDatas['newRole'])) {
+    
+        // Vérification pour newRole : ne traiter que si non null et non vide
+        if (!empty($requestDatas['newRole'])) {
             $rolesDatas = is_array($requestDatas['newRole']) ? $requestDatas['newRole'] : [$requestDatas['newRole']];
             $user->setRoles($rolesDatas);
             $this->dm->persist($user);
             $this->dm->flush();
         }
-        if (isset($requestDatas['checkPassword']) && isset($requestDatas['newPassword'])) {
+    
+        // Vérification pour checkPassword et newPassword : ne traiter que si non null et non vides
+        if (!empty($requestDatas['checkPassword']) && !empty($requestDatas['newPassword'])) {
             $plainTextCheckPassword = $requestDatas['checkPassword'];
             $plainTextNewPassword = $requestDatas['newPassword'];
             $matchedPassword = $this->passwordHasher->isPasswordValid($user, $plainTextCheckPassword);
+    
             if ($matchedPassword) {
                 $user->setPassword($this->passwordHasher->hashPassword($user, $plainTextNewPassword));
                 $this->dm->persist($user);
@@ -188,13 +194,14 @@ class UserService {
                 ];
             }
         }
-        
+    
         $this->dm->flush();
         return [
-            'status' => 'success', 
+            'status' => 'success',
             'data' => $user
         ];
     }
+    
     public function getUsers()
     {
         $users = $this->userRepo->findAll();
@@ -203,7 +210,6 @@ class UserService {
         }
         return $users;
     }
-
     public function getThisUser(string $id){
         $user = $this->userRepo->find($id);
         if(!$user){
@@ -214,7 +220,6 @@ class UserService {
         }
         return $user;
     }
-
     public function sendResetPasswordEmail(User $user) 
     {
         $dateNow = new \DateTime();
@@ -244,7 +249,7 @@ class UserService {
         }
     
         // Construction de l'URL de réinitialisation de mot de passe
-        $resetPassUrl = "https://localhost:3000/reset-password/$token";
+        $resetPassUrl = "https://pro.testdwm.fr/reset-password/$token";
     
         // Préparation de l'email
         $email = (new Email())
@@ -261,7 +266,6 @@ class UserService {
             'status' => "success"
         ];
     }
-
     public function resetPassword(string $password, string $token){
         $findUser = $this->userRepo->findOneBy(['verificationToken' => $token]);
         if(!$findUser){
@@ -281,8 +285,6 @@ class UserService {
             ];
         }
     }
-    
-
     public function sendChangeEmail(User $user, string $email){
         $dateNow = new \DateTime();
         $token = $user->getVerificationToken();
@@ -312,7 +314,7 @@ class UserService {
         $this->dm->flush();
     
         // Construction de l'URL de confirmation d'email
-        $confirmUrl = "https://localhost/api/user/confirm-email/$token";
+        $confirmUrl = "https://api.testdwm.fr/api/user/confirm-email/$token";
     
         // Préparation de l'email
         $emailMessage = (new Email())
@@ -329,7 +331,6 @@ class UserService {
             'status' => "success"
         ];
     }
-    
     public function getUserByToken(string $token){
         $user = $this->userRepo->findOneBy(['verificationToken' => $token]);
         if(!$user){
@@ -338,7 +339,6 @@ class UserService {
             return $user;
         }
     }
-
     public function confirmEmail(string $token){
         $user = $this->getUserByToken($token);
         if (!$user) {
@@ -385,5 +385,10 @@ class UserService {
      * @inheritDoc
      */
     public function getPassword(): string|null {
+    }
+
+    public function generateToken(){
+        $token = bin2hex(random_bytes(32));
+        return $token;
     }
 }

@@ -1,21 +1,17 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
+# config/services.yaml
 
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
-    env(MONGODB_URL): ''
-    env(MONGODB_DB): ''
-
+    # Définir les paramètres ici, si nécessaire
+    mongodb_url: '%env(resolve:MONGODB_URL)%'
+    mongodb_db: '%env(resolve:MONGODB_DB)%'
 
 services:
-    # default configuration for services in *this* file
+    # Configuration par défaut pour les services
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autowire: true      # Injection automatique des dépendances
+        autoconfigure: true # Enregistrement automatique des services
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
+    # Création automatique des services pour les classes dans le répertoire src/
     App\:
         resource: '../src/'
         exclude:
@@ -23,19 +19,13 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    # App\Repository\ArtisteRepository:
-    #     class: App\Repository\ArtisteRepository
-    #     arguments:
-    #         - '@doctrine_mongodb.odm.document_manager'
-    #     tags: ['doctrine.repository_service']
-
+    # Définition explicite des services
     App\EventListener\AuthenticationSuccessListener:
         tags:
             - { name: kernel.event_listener, event: security.interactive_login, method: onAuthenticationSuccess }
 
     Doctrine\Persistence\ManagerRegistry: '@doctrine_mongodb'
+
     App\Controller\CustomerLoginController:
         public: true
         autowire: true
@@ -47,7 +37,6 @@ services:
         calls:
             - setLogger: ['@logger']
 
-
     App\EventListener\ExceptionListener:
         tags:
             - { name: kernel.event_listener, event: kernel.exception }
@@ -58,7 +47,6 @@ services:
         calls:
             - setLogger: ['@logger']
 
-
     App\Repository\CommerceRepository:
         arguments:
             $dm: '@doctrine_mongodb.odm.document_manager'
@@ -68,7 +56,7 @@ services:
     App\EventSubscriber\MarkerSubscriber:
         tags:
             - { name: doctrine_mongodb.odm.event_subscriber }
-    
+
     App\EventSubscriber\ArtisteSubscriber:
         tags:
             - { name: doctrine_mongodb.odm.event_subscriber }
@@ -81,4 +69,4 @@ services:
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
 
-
+    Symfony\Component\Dotenv\Command\DotenvDumpCommand: ~
