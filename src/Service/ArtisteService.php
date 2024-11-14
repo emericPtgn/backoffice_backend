@@ -10,21 +10,29 @@ use App\Repository\ArtisteRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use App\Utils\DocumentPersister;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ArtisteService {
     private DocumentManager $dm;
     private ArtisteRepository $artisteRepo;
     private LoggerInterface $logger;
+    private $slugger;
+    private $uploadsDirectory;
+
     
-    public function __construct(DocumentManager $dm, ArtisteRepository $artisteRepo, LoggerInterface $logger)
+    public function __construct(DocumentManager $dm, ArtisteRepository $artisteRepo, LoggerInterface $logger, SluggerInterface $slugger, string $uploadsDirectory)
     {
         $this->dm = $dm;
         $this->artisteRepo = $artisteRepo;
         $this->logger = $logger;
+        $this->slugger = $slugger;
+        $this->uploadsDirectory = $uploadsDirectory;
     }
 
     // instancie nouvel artiste et persiste en base 
-    public function addArtiste(array $requestDatas) 
+    public function addArtiste(array $requestDatas, ?UploadedFile $imageFile = null) 
     {
         $artiste = new Artiste();
     
@@ -86,10 +94,32 @@ class ArtisteService {
                 }
             }
         }
+
+        if ($imageFile) {
+            $imagePath = $this->handleImageUpload($imageFile);
+            $artiste->setImagePath($imagePath);
+        }
+
     
         return DocumentPersister::persistDocument($this->dm, $artiste);
 
     }
+
+    private function handleImageUpload(UploadedFile $imageFile): string
+    {
+        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeFilename = $this->slugger->slug($originalFilename);
+        $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+
+        try {
+            $imageFile->move($this->uploadsDirectory, $newFilename);
+        } catch (FileException $e) {
+            throw new \Exception("Erreur lors du téléchargement de l'image");
+        }
+
+        return "/uploads/photos/$newFilename";
+    }
+
     // correspondance par id identifie l'artiste à effacer de la base
     public function removeArtiste(string $id)
     {

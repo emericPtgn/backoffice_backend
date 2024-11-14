@@ -39,6 +39,10 @@ class Artiste
     #[MaxDepth(1)]
     private ?Collection $activities;
 
+    #[MongoDB\Field(type: 'string', name: 'pictPath')]
+    #[Groups(["artiste"])]
+    protected ?string $pictPath = null;
+
     public function __construct()
     {
         $this->reseauxSociaux = new ArrayCollection();
@@ -122,4 +126,16 @@ class Artiste
         }
         return $this;
     }
+
+    public function getImagePath(): ?string
+    {
+        return $this->pictPath;
+    }
+
+    public function setImagePath(string $pictPath): self
+    {
+        $this->pictPath = $pictPath;
+        return $this;
+}
+
 }

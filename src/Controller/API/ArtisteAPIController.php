@@ -3,6 +3,7 @@
 namespace App\Controller\API;
 
 use App\Service\ArtisteService;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -10,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
 
 #[AsController]
@@ -23,13 +25,20 @@ class ArtisteAPIController extends AbstractController {
         $this->serializer = $serializer;
     }
 
-    #[Route('/api/artiste', name: 'app_artiste_addnew', methods:['POST'])]
-    public function addArtiste(Request $request) : JsonResponse {
-        $requestDatas = json_decode($request->getContent(), true);
-        $artiste = $this->artisteService->addArtiste($requestDatas);
+
+    
+    #[Route('/api/artiste', name: 'app_artiste_addnew', methods: ['POST'])]
+    public function addArtiste(Request $request): JsonResponse
+    {
+        $requestDatas = $request->request->all();
+        $imageFile = $request->files->get('photo'); 
+    
+        $artiste = $this->artisteService->addArtiste($requestDatas, $imageFile);
         $serializedArtiste = $this->serializer->serialize($artiste, 'json', ['groups' => 'artiste']);
+    
         return new JsonResponse($serializedArtiste, 200, [], true);
     }
+    
 
     #[Route('/api/artiste/{id}', name: 'app_artiste_remove', methods:['DELETE'])]
     public function removeArtiste(string $id) : JsonResponse {

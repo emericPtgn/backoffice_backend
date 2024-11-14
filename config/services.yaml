@@ -4,6 +4,7 @@ parameters:
     # Définir les paramètres ici, si nécessaire
     mongodb_url: '%env(resolve:MONGODB_URL)%'
     mongodb_db: '%env(resolve:MONGODB_DB)%'
+    uploads_directory: '%kernel.project_dir%/public/uploads'
 
 services:
     # Configuration par défaut pour les services
@@ -68,5 +69,9 @@ services:
     App\EventListener\CorsListener:
         tags:
             - { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
+
+    App\Service\ArtisteService:
+        arguments:
+            $uploadsDirectory: '%uploads_directory%'
 
     Symfony\Component\Dotenv\Command\DotenvDumpCommand: ~
