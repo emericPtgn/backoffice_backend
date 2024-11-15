@@ -32,7 +32,6 @@ class ArtisteAPIController extends AbstractController {
     {
         $requestDatas = $request->request->all();
         $imageFile = $request->files->get('photo'); 
-        dump($imageFile);
         $artiste = $this->artisteService->addArtiste($requestDatas, $imageFile);
         $serializedArtiste = $this->serializer->serialize($artiste, 'json', ['groups' => 'artiste']);
     
@@ -52,7 +51,6 @@ class ArtisteAPIController extends AbstractController {
     public function updateArtiste(Request $request, string $id) : JsonResponse {
         $requestDatas = $request->request->all();
         $imageFile = $request->files->get('photo'); 
-        dump($imageFile);
         $response = $this->artisteService->updateArtiste($id,$requestDatas, $imageFile);
         $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'artiste']);
         return new JsonResponse($serializedResponse, 200, [], true);

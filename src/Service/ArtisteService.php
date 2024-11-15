@@ -97,7 +97,7 @@ class ArtisteService {
 
         if ($imageFile) {
             $imagePath = $this->handleImageUpload($imageFile);
-            $artiste->setImagePath($imagePath);
+            $artiste->setPictPath($imagePath);
         }
 
     
@@ -241,7 +241,7 @@ class ArtisteService {
             }
             if ($imageFile) {
                 $imagePath = $this->handleImageUpload($imageFile);
-                $artiste->setImagePath($imagePath);
+                $artiste->setPictPath($imagePath);
             }
 
             return DocumentPersister::persistDocument($this->dm, $artiste);

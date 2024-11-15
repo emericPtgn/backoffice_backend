@@ -127,12 +127,12 @@ class Artiste
         return $this;
     }
 
-    public function getImagePath(): ?string
+    public function getPictPath(): ?string
     {
         return $this->pictPath;
     }
 
-    public function setImagePath(string $pictPath): self
+    public function setPictPath(string $pictPath): self
     {
         $this->pictPath = $pictPath;
         return $this;
