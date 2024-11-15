@@ -163,7 +163,7 @@ class ArtisteService {
     
     // correspondance par id identifie l'ratiste à mettre à jour en base
     // données issues de l'état local du composant REACT mis à jour 
-    public function updateArtiste(string $id, array $requestDatas)
+    public function updateArtiste(string $id, array $requestDatas = null, ?UploadedFile $imageFile = null)
     {
         $artiste = $this->dm->getRepository(Artiste::class)->find($id);
         if (!$artiste) {
@@ -239,11 +239,15 @@ class ArtisteService {
                     }
                 }
             }
+            if ($imageFile) {
+                $imagePath = $this->handleImageUpload($imageFile);
+                $artiste->setImagePath($imagePath);
+            }
 
             return DocumentPersister::persistDocument($this->dm, $artiste);
         }
     }
-    // extrait la liste de TOUS les artistes enregistrées en base
+    // extrait la liste de TOUS les artistes enregistrés en base
     public function getArtistes()
     {
         $artistes = $this->dm->getRepository(Artiste::class)->findAll();

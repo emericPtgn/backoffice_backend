@@ -32,7 +32,7 @@ class ArtisteAPIController extends AbstractController {
     {
         $requestDatas = $request->request->all();
         $imageFile = $request->files->get('photo'); 
-    
+        dump($imageFile);
         $artiste = $this->artisteService->addArtiste($requestDatas, $imageFile);
         $serializedArtiste = $this->serializer->serialize($artiste, 'json', ['groups' => 'artiste']);
     
@@ -47,10 +47,13 @@ class ArtisteAPIController extends AbstractController {
         return new JsonResponse($serializedResponse, 200, [], true);
     }
 
-    #[Route('/api/artiste/{id}', name: 'app_artiste_update', methods:['PUT'])]
+    #[Route('/api/artiste/{id}', name: 'app_artiste_update', methods:['POST'])]
+    // utilisation méthode POST, car la méthode PUT n'est pas construite pour traiter nativement les fichiers multipart-form-data
     public function updateArtiste(Request $request, string $id) : JsonResponse {
-        $requestDatas = json_decode($request->getContent(), true);
-        $response = $this->artisteService->updateArtiste($id,$requestDatas);
+        $requestDatas = $request->request->all();
+        $imageFile = $request->files->get('photo'); 
+        dump($imageFile);
+        $response = $this->artisteService->updateArtiste($id,$requestDatas, $imageFile);
         $serializedResponse = $this->serializer->serialize($response, 'json', ['groups' => 'artiste']);
         return new JsonResponse($serializedResponse, 200, [], true);
     }
